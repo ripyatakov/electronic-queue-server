@@ -12,7 +12,7 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User saveUsers(User user){
+    public User saveUser(User user){
         return userRepository.save(user);
     }
 
@@ -36,11 +36,21 @@ public class UserService {
         return "User deleted " + id;
     }
 
+    public User getUserByToken(String token){
+        return userRepository.findByToken(token);
+    }
+
     public User updateUser(User user){
         User existingUser = userRepository.findById(user.getId()).orElse(null);
         existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setRole(user.getRole());
+        existingUser.setToken(user.getToken());
         return userRepository.save(existingUser);
     }
 
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
 }
