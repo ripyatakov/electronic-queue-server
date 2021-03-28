@@ -1,10 +1,12 @@
 package com.ripyatakov.eqserver.service;
 
 import com.ripyatakov.eqserver.entity.Queue;
+import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.repository.QueueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,6 +46,14 @@ public class QueueService {
         existingQueue.setEqOwnerId(queue.getEqOwnerId());
         existingQueue.setEqType(queue.getEqType());
         return repository.save(existingQueue);
+    }
+
+    public List<Queue> getQueuesFromList(List<QueueListLive> list){
+        List<Queue> queues = new ArrayList<>();
+        for (QueueListLive q: list){
+            queues.add(getQueueById(q.getEqQId()));
+        }
+        return queues;
     }
 
     public String deleteQueue(int id){
