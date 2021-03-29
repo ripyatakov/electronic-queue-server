@@ -11,4 +11,8 @@ public interface QueueListLiveRepository extends JpaRepository<QueueListLive, Qu
     long countByEqQId(int eqQId);
     QueueListLive findByEqQIdAndEqUId(int eqQId, int eqUId);
     List<QueueListLive> findByEqUId(int eqUId);
+
+    QueueListLive findFirstByEqQIdOrderByEqNumberDesc(int eqQId);
+
+    QueueListLive findFirstByEqNumberGreaterThanAndEqQIdOrderByEqNumber(int eqNumber, int eqQId);
 }

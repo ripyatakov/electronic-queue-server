@@ -2,9 +2,11 @@ package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.requests.AuthorizationRequest;
+import com.ripyatakov.eqserver.schedulers.ActiveQueueScheduler;
 import com.ripyatakov.eqserver.service.Hasher;
 import com.ripyatakov.eqserver.service.TokenGenerator;
 import com.ripyatakov.eqserver.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 public class AuthorizationController {
     @Autowired
     private UserService userService;
-
     @PostMapping("/register/{role}")
     public ResponseEntity register(@RequestBody AuthorizationRequest registrationRequest, @PathVariable String role){
         return register(role, registrationRequest);

@@ -16,14 +16,30 @@ public class QueueListLiveService {
 
     public boolean registerForQueue(Queue queue, User user){
         if (queueListLiveRepository.countByEqQId(queue.getId()) < queue.getEqMaxUsers()){
-            QueueListLive newRecord = new QueueListLive(queue.getId(), user.getId(),0);
+            QueueListLive q = queueListLiveRepository.findFirstByEqQIdOrderByEqNumberDesc(queue.getId());
+            int eqNumber = 0;
+            if (q != null)
+                eqNumber = q.getEqNumber() + 1;
+            QueueListLive newRecord = new QueueListLive(queue.getId(), user.getId(),eqNumber);
             queueListLiveRepository.save(newRecord);
             return true;
         }
         return false;
     }
 
-    public long queueCapacity(Queue queue){
+    public boolean skipAhead(Queue queue, User user){
+        QueueListLive user1 = queueListLiveRepository.findByEqQIdAndEqUId(queue.getId(), user.getId());
+        int a = user1.getEqNumber();
+        QueueListLive user2 = queueListLiveRepository.findFirstByEqNumberGreaterThanAndEqQIdOrderByEqNumber(user1.getEqNumber(), user1.getEqQId());
+        int b = user2.getEqNumber();
+        user1.setEqNumber(b);
+        user2.setEqNumber(a);
+        queueListLiveRepository.save(user1);
+        queueListLiveRepository.save(user2);
+        return true;
+    }
+
+    public long queueSize(Queue queue){
         return queueListLiveRepository.countByEqQId(queue.getId());
     }
 
