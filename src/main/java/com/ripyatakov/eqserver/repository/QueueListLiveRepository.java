@@ -10,7 +10,10 @@ import java.util.List;
 public interface QueueListLiveRepository extends JpaRepository<QueueListLive, QueueListLiveId> {
     long countByEqQId(int eqQId);
     QueueListLive findByEqQIdAndEqUId(int eqQId, int eqUId);
+
     List<QueueListLive> findByEqUId(int eqUId);
+
+    List<QueueListLive> findByEqQId(int eqQId);
 
     QueueListLive findFirstByEqQIdOrderByEqNumberDesc(int eqQId);
 

@@ -55,4 +55,8 @@ public class QueueListLiveService {
     public List<QueueListLive> getMyQueueList(User user){
         return queueListLiveRepository.findByEqUId(user.getId());
     }
+
+    public List<QueueListLive> getQueueRecordings(Queue queue){
+        return queueListLiveRepository.findByEqQId(queue.getId());
+    }
 }

@@ -7,9 +7,9 @@ import java.util.Date;
 
 public interface OnlineQueue {
 
-    void registerForQueue(User user);
+    boolean registerForQueue(User user);
 
-    void leaveQueue(Queue queue);
+    boolean leaveQueue(User user);
 
     boolean isUpdated();
 
@@ -17,13 +17,17 @@ public interface OnlineQueue {
 
     float getAverageWaitingTime();
 
-    User nextUser();
+    int nextUser();
 
-    User previousUser();
+    int previousUser();
+
+    int currentUser();
 
     Date getStartDate();
 
     Date getEndDate();
+
+    void update();
 
 
 }

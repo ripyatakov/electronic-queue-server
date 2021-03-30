@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "queuelistlive")
 @IdClass(QueueListLiveId.class)
-public class QueueListLive {
+public class QueueListLive implements Comparable {
     @Id
     @Column(name = "eq_qid")
     private int eqQId;
@@ -23,4 +23,10 @@ public class QueueListLive {
     private int eqUId;
 
     private int eqNumber;
+
+    @Override
+    public int compareTo(Object o) {
+        QueueListLive obj = (QueueListLive)o;
+        return Integer.compare(eqNumber, obj.getEqNumber());
+    }
 }

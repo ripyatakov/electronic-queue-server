@@ -2,7 +2,6 @@ package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.requests.AuthorizationRequest;
-import com.ripyatakov.eqserver.schedulers.ActiveQueueScheduler;
 import com.ripyatakov.eqserver.service.Hasher;
 import com.ripyatakov.eqserver.service.TokenGenerator;
 import com.ripyatakov.eqserver.service.UserService;

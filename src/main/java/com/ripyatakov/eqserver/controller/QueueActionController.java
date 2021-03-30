@@ -4,6 +4,7 @@ import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
+import com.ripyatakov.eqserver.service.OnlineQueueService;
 import com.ripyatakov.eqserver.service.QueueListLiveService;
 import com.ripyatakov.eqserver.service.QueueService;
 import com.ripyatakov.eqserver.service.UserService;
@@ -22,6 +23,8 @@ public class QueueActionController {
     private QueueService queueService;
     @Autowired
     private QueueListLiveService queueListLiveService;
+    @Autowired
+    private OnlineQueueService onlineQueueService;
 
     private User getUser(AuthenticationRequest authenticationRequest) {
         return userService.getUserByToken(authenticationRequest.getToken());
@@ -36,6 +39,9 @@ public class QueueActionController {
             Queue queue = queueService.getQueueById(qid);
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
+            if (onlineQueueService.registerForQueue(queue, user)){
+                return ResponseEntity.status(HttpStatus.OK).body("Successfully registered");
+            }
             if (queueListLiveService.registerForQueue(queue, user)) {
                 return ResponseEntity.status(HttpStatus.OK).body("Successfully registered");
             } else {
@@ -56,6 +62,9 @@ public class QueueActionController {
             Queue queue = queueService.getQueueById(qid);
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
+            if (onlineQueueService.leaveQueue(queue, user)){
+                return ResponseEntity.status(HttpStatus.OK).body("Successfully left queue");
+            }
             if (queueListLiveService.leaveQueue(queue, user))
                 return ResponseEntity.status(HttpStatus.OK).body("Successfully left queue");
             else
@@ -111,5 +120,9 @@ public class QueueActionController {
             exc.printStackTrace();
             return ResponseEntity.status(404).body("Something went wrong");
         }
+    }
+    @GetMapping("/todaysQueues")
+    public ResponseEntity getTodaysQueues(){
+        return ResponseEntity.status(200).body(queueService.todayQueues());
     }
 }
