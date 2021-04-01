@@ -14,6 +14,15 @@ public class QueueListLiveService {
     @Autowired
     QueueListLiveRepository queueListLiveRepository;
 
+    public int deleteAll(List<QueueListLive> queues){
+        queueListLiveRepository.deleteAll(queues);
+        return queues.size();
+    }
+
+    public int saveAll(List<QueueListLive> queues){
+        return queueListLiveRepository.saveAll(queues).size();
+    }
+
     public boolean registerForQueue(Queue queue, User user){
         if (queueListLiveRepository.countByEqQId(queue.getId()) < queue.getEqMaxUsers()){
             QueueListLive q = queueListLiveRepository.findFirstByEqQIdOrderByEqNumberDesc(queue.getId());

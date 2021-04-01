@@ -10,6 +10,7 @@ public class OnlineQueueLive implements OnlineQueue {
 
     public OnlineQueueLive(Queue queueInfo, List<QueueListLive> queue) {
         this.queueInfo = queueInfo;
+        //this.currentUserIndex = queueInfo.getEqCurrentUser();
         this.queue = Collections.synchronizedList(new ArrayList<>(queue));
         this.queue.sort(new Comparator<QueueListLive>() {
             @Override
@@ -21,20 +22,35 @@ public class OnlineQueueLive implements OnlineQueue {
         this.toDelete = Collections.synchronizedList(new ArrayList<>());
     }
 
+    public Queue getQueueInfo() {
+        return queueInfo;
+    }
+
     Queue queueInfo;
-    int currentUserIndex = 0;
-    List<QueueListLive> queue;
+    //int currentUserIndex = 0;
+    final List<QueueListLive> queue;
     boolean updated = false;
 
     List<QueueListLive> toDelete;
 
     @Override
+    public synchronized int isRegistered(User user) {
+        for (int i = 0; i < queue.size(); i++) {
+            if (queue.get(i).getEqUId() == user.getId()){
+                return i - queueInfo.getEqCurrentUser();
+            }
+        }
+        return -1;
+    }
+
+    @Override
     public boolean registerForQueue(User user) {
         try {
             synchronized (queue) {
-                if (queue.size() >= queueInfo.getEqMaxUsers())
+                QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), getNewEqNumber());
+                if (queue.size() >= queueInfo.getEqMaxUsers() || queue.contains(newRecord))
                     return false;
-                queue.add(new QueueListLive(queueInfo.getId(), user.getId(), getNewEqNumber()));
+                queue.add(newRecord);
                 updated = true;
                 return true;
             }
@@ -57,7 +73,7 @@ public class OnlineQueueLive implements OnlineQueue {
                 if (userIndex == -1 || userIndex >= queue.size()) {
                     return false;
                 }
-                if (userIndex < currentUserIndex)
+                if (userIndex <= queueInfo.getEqCurrentUser())
                     return false;
 
                 synchronized (toDelete){
@@ -89,16 +105,21 @@ public class OnlineQueueLive implements OnlineQueue {
     }
 
     @Override
-    public int nextUser() {
-        int cui = currentUserIndex + 1;
+    public synchronized int nextUser() {
+        int cui = queueInfo.getEqCurrentUser() + 1;
         if (cui < 0 || cui >= queue.size())
             return -1;
-        return queue.get(cui).getEqUId();
+        queueInfo.setEqCurrentUser(cui);
+        synchronized (queue) {
+            updated = true;
+            return queue.get(queueInfo.getEqCurrentUser()).getEqUId();
+        }
     }
+
 
     @Override
     public int previousUser() {
-        int cui = currentUserIndex - 1;
+        int cui = queueInfo.getEqCurrentUser() - 1;
         if (cui < 0 || cui >= queue.size())
             return -1;
         return queue.get(cui).getEqUId();
@@ -106,9 +127,9 @@ public class OnlineQueueLive implements OnlineQueue {
 
     @Override
     public int currentUser() {
-        if (currentUserIndex < 0 || currentUserIndex >= queue.size())
+        if (queueInfo.getEqCurrentUser() < 0 || queueInfo.getEqCurrentUser() >= queue.size())
             return -1;
-        return queue.get(currentUserIndex).getEqUId();
+        return queue.get(queueInfo.getEqCurrentUser()).getEqUId();
     }
 
     @Override
@@ -123,14 +144,17 @@ public class OnlineQueueLive implements OnlineQueue {
 
     @Override
     public void update(){
+        toDelete.clear();
         toDelete = Collections.synchronizedList(new ArrayList<>());
         updated = false;
     }
 
     private int getNewEqNumber() {
-        if (queue.isEmpty())
-            return 0;
-        return Collections.max(queue).getEqNumber() + 1;
+        synchronized (queue) {
+            if (queue.isEmpty())
+                return 0;
+            return Collections.max(queue).getEqNumber() + 1;
+        }
     }
 
     public List<QueueListLive> dataToSave(){
@@ -139,5 +163,6 @@ public class OnlineQueueLive implements OnlineQueue {
     public List<QueueListLive> dataToDelete() {
         return toDelete;
     }
+
 
 }

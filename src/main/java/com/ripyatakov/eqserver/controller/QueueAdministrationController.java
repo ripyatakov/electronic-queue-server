@@ -2,7 +2,10 @@ package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.managers.OnlineQueuesManager;
+import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.CreateQueueRequest;
+import com.ripyatakov.eqserver.service.OnlineQueueService;
 import com.ripyatakov.eqserver.service.QueueService;
 import com.ripyatakov.eqserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ public class QueueAdministrationController {
     private UserService userService;
     @Autowired
     private QueueService queueService;
+    @Autowired
+    private OnlineQueueService onlineQueueService;
 
     @GetMapping("/allQueues")
     public List<Queue> allQueues(){
@@ -71,7 +76,29 @@ public class QueueAdministrationController {
         }
 
     }
-
+    @PostMapping("/next/{qid}")
+    public ResponseEntity next(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
+        try {
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Somebody was authorized by your password");
+            Queue queue = queueService.getQueueById(qid);
+            if (queue == null)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
+            if (queue.getEqOwnerId() != user.getId()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are not an owner!");
+            }
+            int uid = onlineQueueService.nextUser(queue);
+            if (uid == -1){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No more users in queue or queue not started");
+            } else{
+                return ResponseEntity.status(200).body(userService.getUserById(uid));
+            }
+        } catch (Exception exc){
+            exc.printStackTrace();
+            return ResponseEntity.status(404).body("Something went wrong");
+        }
+    }
 
 
 }

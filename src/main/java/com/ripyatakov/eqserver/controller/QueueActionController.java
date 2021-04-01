@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class QueueActionController {
@@ -82,7 +83,14 @@ public class QueueActionController {
             if (user == null)
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Somebody was authorized by your password");
             List<QueueListLive> queueListLives = queueListLiveService.getMyQueueList(user);
+            queueListLives = queueListLives
+                    .stream()
+                    .filter(
+                        a -> !onlineQueueService.isOnline(a.getEqQId())
+                    )
+                    .collect(Collectors.toList());
             List<Queue> myQueues = queueService.getQueuesFromList(queueListLives);
+            myQueues.addAll(onlineQueueService.myOnlineQueues(user));
             return ResponseEntity.status(200).body(myQueues);
         } catch (Exception exc) {
             exc.printStackTrace();

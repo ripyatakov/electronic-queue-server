@@ -14,27 +14,27 @@ import javax.persistence.*;
 public class Queue {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private int id;
+    protected int id;
 
-    private int eqOwnerId;
+    protected int eqOwnerId;
 
     @Column(name = "eq_avgwt")
-    private double eqAverageWaitingTime;
+    protected double eqAverageWaitingTime;
 
-    private int eqCurrentUser;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private java.util.Date eqDateStart;
+    protected int eqCurrentUser;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private java.util.Date eqDateEnd;
+    protected java.util.Date eqDateStart;
 
-    private String eqType;
+    @Temporal(TemporalType.TIMESTAMP)
+    protected java.util.Date eqDateEnd;
 
-    private int eqMaxUsers;
+    protected String eqType;
 
-    private String eqTitle;
+    protected int eqMaxUsers;
 
-    private String eqDescription;
+    protected String eqTitle;
+
+    protected String eqDescription;
 
 }

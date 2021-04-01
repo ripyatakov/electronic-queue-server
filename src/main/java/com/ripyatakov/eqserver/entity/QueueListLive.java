@@ -27,6 +27,14 @@ public class QueueListLive implements Comparable {
     @Override
     public int compareTo(Object o) {
         QueueListLive obj = (QueueListLive)o;
+        if (equals(obj))
+            return 0;
         return Integer.compare(eqNumber, obj.getEqNumber());
+    }
+
+    @Override
+    public boolean equals(Object o){
+        QueueListLive obj = (QueueListLive)o;
+        return (getEqUId() == obj.getEqUId()) && (getEqQId() == obj.getEqQId());
     }
 }

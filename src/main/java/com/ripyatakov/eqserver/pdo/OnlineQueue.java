@@ -7,6 +7,8 @@ import java.util.Date;
 
 public interface OnlineQueue {
 
+    int isRegistered(User user);
+
     boolean registerForQueue(User user);
 
     boolean leaveQueue(User user);

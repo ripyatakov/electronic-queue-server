@@ -36,7 +36,13 @@ public class OnlineQueuesManager {
         }
     }
     @Scheduled(fixedDelayString = "${queueUpdateDelay}", initialDelayString = "${queueInitialDelay}"  )
-    private void updateQueues(){
-        System.out.println("Updated");
+    private synchronized void updateQueues(){
+        System.out.println("Update beginning");
+        System.out.println("Delete: \t" + queueListLiveService.deleteAll(onlineQueuesService.dataToDelete()) + " records");
+        System.out.println("Save: \t" + queueListLiveService.saveAll(onlineQueuesService.dataToSave()) + " records");
+        System.out.println("Save queueInfos: \t" + queueService.saveQueues(onlineQueuesService.queueInfoData()) + " records");
+        onlineQueuesService.clearDeletedRecords();
+        onlineQueuesService.clearInactiveQueues();
+
     }
 }

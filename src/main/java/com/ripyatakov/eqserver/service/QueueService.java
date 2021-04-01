@@ -20,8 +20,8 @@ public class QueueService {
         return repository.save(queue);
     }
 
-    public List<Queue> saveQueues(List<Queue> queues){
-        return repository.saveAll(queues);
+    public int saveQueues(List<Queue> queues){
+        return repository.saveAll(queues).size();
     }
 
     public Queue getQueueById(int id){
