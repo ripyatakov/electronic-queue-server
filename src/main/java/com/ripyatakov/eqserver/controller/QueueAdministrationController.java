@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,11 @@ public class QueueAdministrationController {
     private QueueService queueService;
     @Autowired
     private OnlineQueueService onlineQueueService;
+
+    private boolean queueToOnline(Queue queue){
+        return ((queue.getEqDateStart().getTime()/1000/60/60/24 == (new Date()).getTime()/1000/60/60/24) ||
+        (queue.getEqDateStart().before(new Date()) && queue.getEqDateEnd().after(new Date())));
+    }
 
     @GetMapping("/allQueues")
     public List<Queue> allQueues(){
@@ -46,6 +54,10 @@ public class QueueAdministrationController {
                     createQueueRequest.getDescription()
                     );
             queue = queueService.saveQueue(queue);
+            if (queueToOnline(queue)){
+                onlineQueueService.loadOnlineLiveQueue(queue, new ArrayList<>());
+                System.out.println("Queue online registered");
+            }
             return ResponseEntity.status(HttpStatus.OK).body(queue);
         } catch (Exception exc){
             exc.printStackTrace();
@@ -69,6 +81,14 @@ public class QueueAdministrationController {
                     createQueueRequest.getDescription()
             );
             queue = queueService.saveQueue(queue);
+            Date now = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat(
+                    "dd/MM/yyyy");
+
+            if (queueToOnline(queue)){
+                onlineQueueService.loadOnlineLiveQueue(queue, new ArrayList<>());
+                System.out.println("Queue online registered");
+            }
             return ResponseEntity.status(HttpStatus.OK).body(queue);
         } catch (Exception exc){
             exc.printStackTrace();

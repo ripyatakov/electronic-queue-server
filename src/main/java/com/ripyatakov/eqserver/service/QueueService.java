@@ -74,7 +74,7 @@ public class QueueService {
         Date d1 = calendar.getTime();
         calendar.add(Calendar.DATE, 1);
         Date d2 = calendar.getTime();
-        return repository.findAllByEqDateStartBetween(d1, d2);
+        return repository.findAllByEqDateStartBetweenOrEqDateStartLessThanAndEqDateEndGreaterThan(d1, d2, new Date(), new Date());
 
     }
 

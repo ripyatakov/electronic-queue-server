@@ -10,5 +10,5 @@ import java.util.List;
 public interface QueueRepository extends JpaRepository<Queue, Integer> {
     List<Queue> findByEqOwnerId(int eqOwnerId);
 
-    List<Queue> findAllByEqDateStartBetween(Date d1, Date d2);
+    List<Queue> findAllByEqDateStartBetweenOrEqDateStartLessThanAndEqDateEndGreaterThan(Date d1, Date d2, Date d3, Date d4);
 }

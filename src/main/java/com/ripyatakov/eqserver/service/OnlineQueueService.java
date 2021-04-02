@@ -16,15 +16,15 @@ public class OnlineQueueService {
 
     Map<Integer, OnlineQueueLive> onlineQueues = Collections.synchronizedMap(new HashMap<>());
 
-    public boolean isOnline(int qid){
+    public synchronized boolean isOnline(int qid){
         return onlineQueues.containsKey(qid);
     }
 
-    public boolean isOnline(Queue q){
+    public synchronized boolean isOnline(Queue q){
         return onlineQueues.containsKey(q.getId());
     }
 
-    public void clearInactiveQueues(){
+    public synchronized void clearInactiveQueues(){
         for (OnlineQueue q: onlineQueues.values()) {
             if (!q.isActive()){
                 onlineQueues.remove(q);
@@ -39,8 +39,6 @@ public class OnlineQueueService {
     }
 
     public synchronized void loadOnlineLiveQueue(Queue queueInfo, List<QueueListLive> queue){
-        if (queue.isEmpty())
-            return;
         int qid = queueInfo.getId();
         OnlineQueueLive queueLive = new OnlineQueueLive(queueInfo, queue);
         onlineQueues.put(qid, queueLive);
@@ -93,14 +91,21 @@ public class OnlineQueueService {
         return onlineQueues.get(queue.getId()).nextUser();
     }
 
-    public synchronized List<OnlineQueueData> myOnlineQueues(User user){
-        List<OnlineQueueData> answ = new ArrayList<>();
+    public synchronized List<Queue> myOnlineQueues(User user){
+        List<Queue> answ = new ArrayList<>();
         for (OnlineQueueLive q: onlineQueues.values()){
-            int userBefore = q.isRegistered(user);
-            if (userBefore != -1){
-                answ.add(new OnlineQueueData(q.getQueueInfo(), userBefore));
+            if (q.isRegistered(user)) {
+                int userBefore = q.usersBefore(user);
+                if (userBefore >= 0) {
+                    answ.add(new OnlineQueueData(q.getQueueInfo(), userBefore));
+                }
             }
         }
         return answ;
+    }
+    public synchronized boolean skipAhead(Queue queue, User user){
+        if (!isOnline(queue))
+            return false;
+        return onlineQueues.get(queue.getId()).skipAhead(user);
     }
 }

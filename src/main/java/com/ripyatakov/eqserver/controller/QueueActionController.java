@@ -107,7 +107,8 @@ public class QueueActionController {
             Queue queue = queueService.getQueueById(qid);
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
-
+            if (onlineQueueService.skipAhead(queue, user))
+                return ResponseEntity.status(200).body("Successfully skipped");
             queueListLiveService.skipAhead(queue, user);
             return ResponseEntity.status(200).body("Successfully skipped");
         } catch (Exception exc){
