@@ -8,6 +8,7 @@ import java.util.*;
 
 public class OnlineQueueLive implements OnlineQueue {
 
+    private final int minutesBeforeDelete = 10;
     public OnlineQueueLive(Queue queueInfo, List<QueueListLive> queue) {
         this.queueInfo = queueInfo;
         isBreak = false;
@@ -129,7 +130,7 @@ public class OnlineQueueLive implements OnlineQueue {
 
     @Override
     public synchronized boolean isActive() {
-        return true;
+        return (new Date().getTime() - queueInfo.getEqDateEnd().getTime()) / 1000 / 60 < minutesBeforeDelete;
     }
 
     @Override

@@ -9,16 +9,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequiredArgsConstructor
 public class AuthorizationController {
     @Autowired
     private UserService userService;
+
+    @GetMapping("/greeting")
+    public ResponseEntity greeting(){
+        HashMap<Integer, String> hm = new HashMap<>();
+        for (int i = 0; i < 1000; i++) {
+            hm.put(Hasher.getQId(Hasher.getQueueCode(i)), Hasher.getQueueCode(i));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(hm);
+    }
     @PostMapping("/register/{role}")
     public ResponseEntity register(@RequestBody AuthorizationRequest registrationRequest, @PathVariable String role){
         return register(role, registrationRequest);

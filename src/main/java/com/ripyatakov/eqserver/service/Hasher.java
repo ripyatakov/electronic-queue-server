@@ -5,6 +5,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Hasher {
+    private static int base = 36;
+    private static int bitCoef = 9;
+    private static int offset = 1023;
+    private static int multCoef = 3;
     public static String sha256(String toHash) {
         MessageDigest digest = null;
         try {
@@ -15,6 +19,15 @@ public class Hasher {
         byte[] encodedhash = digest.digest(
                 toHash.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(encodedhash);
+    }
+    public static String getQueueCode(int qid){
+        qid = (qid<<bitCoef) * multCoef + offset;
+        return Integer.toString(qid, base);
+    }
+    public static int getQId(String code){
+        int qid = Integer.parseInt(code, base);
+        qid = ((qid - offset) / multCoef) >> bitCoef;
+        return qid;
     }
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);

@@ -4,10 +4,7 @@ import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
-import com.ripyatakov.eqserver.service.OnlineQueueService;
-import com.ripyatakov.eqserver.service.QueueListLiveService;
-import com.ripyatakov.eqserver.service.QueueService;
-import com.ripyatakov.eqserver.service.UserService;
+import com.ripyatakov.eqserver.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -115,6 +112,24 @@ public class QueueActionController {
             exc.printStackTrace();
             return ResponseEntity.status(404).body("You are the last at queue");
         }
+    }
+
+    @GetMapping("/getQueue/{qid}")
+    public ResponseEntity getQueue(@PathVariable int qid) {
+        try {
+            Queue queue = queueService.getQueueById(qid);
+            if (queue == null)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
+
+            return ResponseEntity.status(200).body(queue);
+        } catch (Exception exc) {
+            exc.printStackTrace();
+            return ResponseEntity.status(404).body("Something went wrong");
+        }
+    }
+    @GetMapping("/getQueueByCode/{code}")
+    public ResponseEntity getQueueByCode(@PathVariable String code) {
+        return this.getQueue(Hasher.getQId(code));
     }
 
     @GetMapping("/getQueueSize/{qid}")

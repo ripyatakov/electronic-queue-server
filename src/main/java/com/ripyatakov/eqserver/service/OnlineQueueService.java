@@ -1,6 +1,6 @@
 package com.ripyatakov.eqserver.service;
 
-import com.ripyatakov.eqserver.dto.OnlineQueueData;
+import com.ripyatakov.eqserver.json.QueueData;
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
@@ -97,7 +97,7 @@ public class OnlineQueueService {
             if (q.isRegistered(user)) {
                 int userBefore = q.usersBefore(user);
                 if (userBefore >= 0) {
-                    answ.add(new OnlineQueueData(q.getQueueInfo(), userBefore));
+                    answ.add(new QueueData(q.getQueueInfo(), userBefore, Hasher.getQueueCode(q.getQueueInfo().getId())));
                 }
             }
         }
@@ -107,5 +107,14 @@ public class OnlineQueueService {
         if (!isOnline(queue))
             return false;
         return onlineQueues.get(queue.getId()).skipAhead(user);
+    }
+
+    public synchronized void removeOfflineQueues(){
+        for (Integer key: onlineQueues.keySet()){
+            if (!onlineQueues.get(key).isActive()){
+                onlineQueues.remove(key);
+                System.out.println("Delete offline key");
+            }
+        }
     }
 }

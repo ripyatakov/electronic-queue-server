@@ -2,9 +2,11 @@ package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.json.QueueData;
 import com.ripyatakov.eqserver.managers.OnlineQueuesManager;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.CreateQueueRequest;
+import com.ripyatakov.eqserver.service.Hasher;
 import com.ripyatakov.eqserver.service.OnlineQueueService;
 import com.ripyatakov.eqserver.service.QueueService;
 import com.ripyatakov.eqserver.service.UserService;
@@ -58,7 +60,7 @@ public class QueueAdministrationController {
                 onlineQueueService.loadOnlineLiveQueue(queue, new ArrayList<>());
                 System.out.println("Queue online registered");
             }
-            return ResponseEntity.status(HttpStatus.OK).body(queue);
+            return ResponseEntity.status(HttpStatus.OK).body(new QueueData(queue, 0, Hasher.getQueueCode(queue.getId())));
         } catch (Exception exc){
             exc.printStackTrace();
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't create queue");
@@ -67,33 +69,7 @@ public class QueueAdministrationController {
     }
     @PostMapping("/createQueue")
     public ResponseEntity createQueue(@RequestBody CreateQueueRequest createQueueRequest){
-        try {
-            User owner = userService.getUserByToken(createQueueRequest.getToken());
-            Queue queue = new Queue(0,
-                    owner.getId(),
-                    createQueueRequest.getMaxUsers(),
-                    0,
-                    createQueueRequest.getDateStart(),
-                    createQueueRequest.getDateEnd(),
-                    "live",
-                    createQueueRequest.getMaxUsers(),
-                    createQueueRequest.getTitle(),
-                    createQueueRequest.getDescription()
-            );
-            queue = queueService.saveQueue(queue);
-            Date now = new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat(
-                    "dd/MM/yyyy");
-
-            if (queueToOnline(queue)){
-                onlineQueueService.loadOnlineLiveQueue(queue, new ArrayList<>());
-                System.out.println("Queue online registered");
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(queue);
-        } catch (Exception exc){
-            exc.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't create queue");
-        }
+        return this.createQueue(createQueueRequest, "live");
 
     }
     @PostMapping("/next/{qid}")

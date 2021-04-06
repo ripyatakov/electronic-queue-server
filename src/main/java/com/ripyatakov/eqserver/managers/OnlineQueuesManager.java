@@ -31,6 +31,7 @@ public class OnlineQueuesManager {
     @PostConstruct
     void initializeOnlineQueues(){
         List<Queue> todayQueues = queueService.todayQueues();
+        System.out.println("Add " +  todayQueues.size() + " online queues");
         for (Queue q: todayQueues) {
             onlineQueuesService.loadOnlineLiveQueue(q, queueListLiveService.getQueueRecordings(q));
         }
@@ -43,6 +44,7 @@ public class OnlineQueuesManager {
         System.out.println("Save queueInfos: \t" + queueService.saveQueues(onlineQueuesService.queueInfoData()) + " records");
         onlineQueuesService.clearDeletedRecords();
         onlineQueuesService.clearInactiveQueues();
+        onlineQueuesService.removeOfflineQueues();
 
     }
 }
