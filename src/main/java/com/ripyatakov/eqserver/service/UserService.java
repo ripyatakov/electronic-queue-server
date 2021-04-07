@@ -53,4 +53,8 @@ public class UserService {
     public User findByEmail(String email){
         return userRepository.findByEmail(email);
     }
+
+    public List<User> findAllByName(String name){
+        return userRepository.findByNameLike(name);
+    }
 }

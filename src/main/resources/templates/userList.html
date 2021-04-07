@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Менеджер очередей</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h2>You</h2>
+<table>
+    <title>You</title>
+    <thead>
+    <tr>
+        <th> id </th>
+        <th> name </th>
+        <th> email </th>
+        <th> role </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${userList.empty}">
+        <td colspan="2"> No Users Available </td>
+    </tr>
+    <tr th:each="user : ${userList}">
+        <td><span th:text="${user.id}"> id </span></td>
+        <td><span th:text="${user.name}"> name </span></td>
+        <td><span th:text="${user.email}"> email </span></td>
+        <td><span th:text="${user.role}"> role </span></td>
+    </tr>
+    </tbody>
+</table>
+<form action="#" th:action="@{/byName}"  method="post">
+    <p>name: <input type="text" /></p>
+    <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+</form>
+</body>
+</html>
