@@ -3,6 +3,7 @@ package com.ripyatakov.eqserver.controller;
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.json.QueueData;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +38,17 @@ public class QueueActionController {
             Queue queue = queueService.getQueueById(qid);
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
-            if (onlineQueueService.registerForQueue(queue, user)){
-                return ResponseEntity.status(HttpStatus.OK).body("Successfully registered");
+            QueueData queueData = onlineQueueService.registerForQueue(queue, user);
+            if (queueData != null){
+                return ResponseEntity.status(HttpStatus.OK).body(queueData);
             }
-            if (queueListLiveService.registerForQueue(queue, user)) {
-                return ResponseEntity.status(HttpStatus.OK).body("Successfully registered");
+            queue = queueListLiveService.registerForQueue(queue, user);
+            if (queue != null) {
+                        queueData = new QueueData(queue,
+                        queueListLiveService.usersBeforeMe(queue, user),
+                        Hasher.getQueueCode(queue.getId())
+                );
+                return ResponseEntity.status(HttpStatus.OK).body(queueData);
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Queue is full");
             }
@@ -88,7 +95,10 @@ public class QueueActionController {
                     .collect(Collectors.toList());
             List<Queue> myQueues = queueService.getQueuesFromList(queueListLives);
             myQueues.addAll(onlineQueueService.myOnlineQueues(user));
-            return ResponseEntity.status(200).body(myQueues);
+            List<QueueData> queueDataList = myQueues.stream()
+                    .map(a -> new QueueData(a, queueListLiveService.usersBeforeMe(a, user), Hasher.getQueueCode(a.getId())))
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(200).body(queueDataList);
         } catch (Exception exc) {
             exc.printStackTrace();
             return ResponseEntity.status(404).body("Something went wrong");

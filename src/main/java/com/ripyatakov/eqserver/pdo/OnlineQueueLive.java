@@ -3,6 +3,8 @@ package com.ripyatakov.eqserver.pdo;
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.json.QueueData;
+import com.ripyatakov.eqserver.service.Hasher;
 
 import java.util.*;
 
@@ -12,7 +14,8 @@ public class OnlineQueueLive implements OnlineQueue {
     public OnlineQueueLive(Queue queueInfo, List<QueueListLive> queue) {
         this.queueInfo = queueInfo;
         isBreak = false;
-        updated = false;
+        updated = true;
+        queueInfo.setEqStatus("active");
         //this.currentUserIndex = queueInfo.getEqCurrentUser();
         this.queue = Collections.synchronizedList(new ArrayList<>(queue));
         this.lastVisit = new Date();
@@ -74,23 +77,23 @@ public class OnlineQueueLive implements OnlineQueue {
     }
 
     @Override
-    public synchronized boolean registerForQueue(User user) {
+    public synchronized QueueData registerForQueue(User user) {
         try {
             synchronized (queue) {
                 QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), getNewEqNumber());
                 if (queue.size() >= queueInfo.getEqMaxUsers() || queue.contains(newRecord))
-                    return false;
+                    return null;
                 queue.add(newRecord);
                 updated = true;
                 if (isBreak){
                     lastVisit = new Date();
                 }
                 isBreak = false;
-                return true;
+                return new QueueData(queueInfo, usersBefore(user), Hasher.getQueueCode(queueInfo.getId()));
             }
         } catch (Exception exc){
             exc.printStackTrace();
-            return false;
+            return null;
         }
     }
 

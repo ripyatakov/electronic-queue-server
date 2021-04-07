@@ -23,7 +23,7 @@ public class QueueListLiveService {
         return queueListLiveRepository.saveAll(queues).size();
     }
 
-    public boolean registerForQueue(Queue queue, User user){
+    public Queue registerForQueue(Queue queue, User user){
         if (queueListLiveRepository.countByEqQId(queue.getId()) < queue.getEqMaxUsers()){
             QueueListLive q = queueListLiveRepository.findFirstByEqQIdOrderByEqNumberDesc(queue.getId());
             int eqNumber = 0;
@@ -31,9 +31,9 @@ public class QueueListLiveService {
                 eqNumber = q.getEqNumber() + 1;
             QueueListLive newRecord = new QueueListLive(queue.getId(), user.getId(),eqNumber);
             queueListLiveRepository.save(newRecord);
-            return true;
+            return queue;
         }
-        return false;
+        return null;
     }
 
     public boolean skipAhead(Queue queue, User user){
@@ -67,5 +67,10 @@ public class QueueListLiveService {
 
     public List<QueueListLive> getQueueRecordings(Queue queue){
         return queueListLiveRepository.findByEqQId(queue.getId());
+    }
+
+    public int usersBeforeMe(Queue queue, User user){
+        QueueListLive user1 = queueListLiveRepository.findByEqQIdAndEqUId(queue.getId(), user.getId());
+        return (int) queueListLiveRepository.countByEqNumberLessThanAndEqQId(user1.getEqNumber(), queue.getId());
     }
 }

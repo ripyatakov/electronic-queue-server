@@ -35,6 +35,13 @@ public class OnlineQueuesManager {
         for (Queue q: todayQueues) {
             onlineQueuesService.loadOnlineLiveQueue(q, queueListLiveService.getQueueRecordings(q));
         }
+        List<Queue> activeQueues = queueService.findByStatus("active");
+        for (Queue q: activeQueues) {
+            if (!onlineQueuesService.isOnline(q)){
+                q.setEqStatus("inactive");
+                queueService.saveQueue(q);
+            }
+        }
     }
     @Scheduled(fixedDelayString = "${queueUpdateDelay}", initialDelayString = "${queueInitialDelay}"  )
     private synchronized void updateQueues(){
@@ -44,7 +51,12 @@ public class OnlineQueuesManager {
         System.out.println("Save queueInfos: \t" + queueService.saveQueues(onlineQueuesService.queueInfoData()) + " records");
         onlineQueuesService.clearDeletedRecords();
         onlineQueuesService.clearInactiveQueues();
-        onlineQueuesService.removeOfflineQueues();
-
+        List<Queue> queues = onlineQueuesService.removeOfflineQueues();
+        if (queues != null && queues.size() > 0) {
+            for (Queue q : queues) {
+                q.setEqStatus("End");
+            }
+            queueService.saveQueues(queues);
+        }
     }
 }

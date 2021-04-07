@@ -78,5 +78,8 @@ public class QueueService {
 
     }
 
+    public List<Queue> findByStatus(String status){
+        return repository.findByEqStatus(status);
+    }
 
 }

@@ -44,12 +44,11 @@ public class OnlineQueueService {
         onlineQueues.put(qid, queueLive);
     }
 
-    public synchronized boolean registerForQueue(Queue queue, User user){
+    public synchronized QueueData registerForQueue(Queue queue, User user){
         if (isOnline(queue)){
-            onlineQueues.get(queue.getId()).registerForQueue(user);
-            return true;
+            return onlineQueues.get(queue.getId()).registerForQueue(user);
         }
-        return false;
+        return null;
     }
 
     public synchronized boolean leaveQueue(Queue queue, User user){
@@ -109,12 +108,14 @@ public class OnlineQueueService {
         return onlineQueues.get(queue.getId()).skipAhead(user);
     }
 
-    public synchronized void removeOfflineQueues(){
+    public synchronized List<Queue> removeOfflineQueues(){
+        List<Queue> answ = new ArrayList<>();
         for (Integer key: onlineQueues.keySet()){
             if (!onlineQueues.get(key).isActive()){
-                onlineQueues.remove(key);
+                answ.add(onlineQueues.remove(key).getQueueInfo());
                 System.out.println("Delete offline key");
             }
         }
+        return answ;
     }
 }

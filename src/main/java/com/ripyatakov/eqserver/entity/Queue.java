@@ -37,4 +37,6 @@ public class Queue {
 
     protected String eqDescription;
 
+    protected String eqStatus;
+
 }

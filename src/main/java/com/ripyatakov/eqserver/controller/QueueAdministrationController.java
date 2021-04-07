@@ -53,7 +53,8 @@ public class QueueAdministrationController {
                     type,
                     createQueueRequest.getMaxUsers(),
                     createQueueRequest.getTitle(),
-                    createQueueRequest.getDescription()
+                    createQueueRequest.getDescription(),
+                    "inactive"
                     );
             queue = queueService.saveQueue(queue);
             if (queueToOnline(queue)){

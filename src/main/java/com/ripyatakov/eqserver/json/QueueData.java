@@ -22,6 +22,7 @@ public class QueueData extends Queue {
         this.setEqDescription(q.getEqDescription());
         this.usersBeforeMe = usersBeforeMe;
         this.expectedTime = usersBeforeMe*q.getEqAverageWaitingTime();
+        this.eqStatus = q.getEqStatus();
         this.code = code;
     }
     private int usersBeforeMe;
