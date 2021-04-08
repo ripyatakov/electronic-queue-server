@@ -12,65 +12,70 @@ import java.util.List;
 @Service
 public class QueueListLiveService {
     @Autowired
-    QueueListLiveRepository queueListLiveRepository;
+    QueueListLiveRepository repository;
 
     public int deleteAll(List<QueueListLive> queues){
-        queueListLiveRepository.deleteAll(queues);
+        repository.deleteAll(queues);
         return queues.size();
     }
 
     public int saveAll(List<QueueListLive> queues){
-        return queueListLiveRepository.saveAll(queues).size();
+        return repository.saveAll(queues).size();
     }
 
     public Queue registerForQueue(Queue queue, User user){
-        if (queueListLiveRepository.countByEqQId(queue.getId()) < queue.getEqMaxUsers()){
-            QueueListLive q = queueListLiveRepository.findFirstByEqQIdOrderByEqNumberDesc(queue.getId());
+        if (repository.countByEqQId(queue.getId()) < queue.getEqMaxUsers()){
+            QueueListLive q = repository.findFirstByEqQIdOrderByEqNumberDesc(queue.getId());
             int eqNumber = 0;
             if (q != null)
                 eqNumber = q.getEqNumber() + 1;
             QueueListLive newRecord = new QueueListLive(queue.getId(), user.getId(),eqNumber);
-            queueListLiveRepository.save(newRecord);
+            repository.save(newRecord);
             return queue;
         }
         return null;
     }
 
     public boolean skipAhead(Queue queue, User user){
-        QueueListLive user1 = queueListLiveRepository.findByEqQIdAndEqUId(queue.getId(), user.getId());
+        QueueListLive user1 = repository.findByEqQIdAndEqUId(queue.getId(), user.getId());
         int a = user1.getEqNumber();
-        QueueListLive user2 = queueListLiveRepository.findFirstByEqNumberGreaterThanAndEqQIdOrderByEqNumber(user1.getEqNumber(), user1.getEqQId());
+        QueueListLive user2 = repository.findFirstByEqNumberGreaterThanAndEqQIdOrderByEqNumber(user1.getEqNumber(), user1.getEqQId());
         int b = user2.getEqNumber();
         user1.setEqNumber(b);
         user2.setEqNumber(a);
-        queueListLiveRepository.save(user1);
-        queueListLiveRepository.save(user2);
+        repository.save(user1);
+        repository.save(user2);
         return true;
     }
 
     public long queueSize(Queue queue){
-        return queueListLiveRepository.countByEqQId(queue.getId());
+        return repository.countByEqQId(queue.getId());
     }
 
     public boolean leaveQueue(Queue queue, User user){
 
-        QueueListLive queueList = queueListLiveRepository.findByEqQIdAndEqUId(queue.getId(), user.getId());
+        QueueListLive queueList = repository.findByEqQIdAndEqUId(queue.getId(), user.getId());
         if (queueList == null)
             return false;
-        queueListLiveRepository.delete(queueList);
+        repository.delete(queueList);
         return true;
     }
 
     public List<QueueListLive> getMyQueueList(User user){
-        return queueListLiveRepository.findByEqUId(user.getId());
+        return repository.findByEqUId(user.getId());
     }
 
     public List<QueueListLive> getQueueRecordings(Queue queue){
-        return queueListLiveRepository.findByEqQId(queue.getId());
+        return repository.findByEqQId(queue.getId());
     }
 
     public int usersBeforeMe(Queue queue, User user){
-        QueueListLive user1 = queueListLiveRepository.findByEqQIdAndEqUId(queue.getId(), user.getId());
-        return (int) queueListLiveRepository.countByEqNumberLessThanAndEqQId(user1.getEqNumber(), queue.getId());
+        QueueListLive user1 = repository.findByEqQIdAndEqUId(queue.getId(), user.getId());
+        return (int) repository.countByEqNumberLessThanAndEqQId(user1.getEqNumber(), queue.getId());
+    }
+
+    public boolean isUserInQueue(Queue queue, User user){
+        QueueListLive queueListLive = repository.findByEqQIdAndEqUId(queue.getId(), user.getId());
+        return queueListLive != null;
     }
 }

@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Список пользователей</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h2>Queue</h2>
+<table>
+    <colgroup>
+        <col span="2" style="background: cyan">
+        <col span="8" style="background: darkseagreen">
+    </colgroup>
+    <title>Queues</title>
+    <thead>
+    <tr>
+        <th> id </th>
+        <th> title </th>
+        <th> description </th>
+        <th> status </th>
+        <th> ownerId </th>
+        <th> averageWaitingTime </th>
+        <th> currentUser </th>
+        <th> dateStart </th>
+        <th> dateEnd </th>
+        <th> type </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><span th:text="${queue.id}"> id </span></td>
+        <td><span th:text="${queue.eqTitle}"> title </span></td>
+        <td><span th:text="${queue.eqDescription}"> description </span></td>
+        <td><span th:text="${queue.eqStatus}"> status </span></td>
+        <td><span th:text="${queue.eqOwnerId}"> ownerId </span></td>
+        <td><span th:text="${queue.eqAverageWaitingTime}"> averageWaitingTime </span></td>
+        <td><span th:text="${queue.eqCurrentUser}"> currentUser </span></td>
+        <td><span th:text="${queue.eqDateStart}"> dateStart </span></td>
+        <td><span th:text="${queue.eqDateEnd}"> dateEnd </span></td>
+        <td><span th:text="${queue.eqType}"> type </span></td>
+    </tr>
+    </tbody>
+</table>
+<h3>Users</h3>
+<table>
+    <colgroup>
+        <col span="1" style="background: cyan">
+        <col span="2" style="background: darkseagreen">
+    </colgroup>
+    <title>Users</title>
+    <thead>
+    <tr>
+        <th> id </th>
+        <th> queuePlace </th>
+        <th> name </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${usersInQueue.empty}">
+        <td colspan="2"> No Users Available </td>
+    </tr>
+    <tr th:each="user : ${usersInQueue}">
+        <td><span th:text="${user.id}"> id </span></td>
+        <td><span th:text="${user.queuePlace}"> queuePlace </span></td>
+        <td><span th:text="${user.name}"> name </span></td>
+    </tr>
+    </tbody>
+</table>
+<form action="#" th:action="@{/start}" th:object="${authenticationRequest}" method="post">
+    <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
+    <p><input type="submit" value="Go back" /></p>
+</form>
+</body>
+</html>

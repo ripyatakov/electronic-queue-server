@@ -2,8 +2,10 @@ package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
+import com.ripyatakov.eqserver.entity.Review;
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.json.QueueData;
+import com.ripyatakov.eqserver.requests.ReviewRequest;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +27,8 @@ public class QueueActionController {
     private QueueListLiveService queueListLiveService;
     @Autowired
     private OnlineQueueService onlineQueueService;
+    @Autowired
+    private ReviewService reviewService;
 
     private User getUser(AuthenticationRequest authenticationRequest) {
         return userService.getUserByToken(authenticationRequest.getToken());
@@ -158,5 +163,25 @@ public class QueueActionController {
     @GetMapping("/todaysQueues")
     public ResponseEntity getTodaysQueues(){
         return ResponseEntity.status(200).body(queueService.todayQueues());
+    }
+
+    @PostMapping("/addReview/{qid}")
+    public ResponseEntity addReview(@RequestBody ReviewRequest reviewRequest, @PathVariable int qid){
+        try {
+            User user = getUser(reviewRequest);
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Somebody was authorized by your password");
+            Queue queue = queueService.getQueueById(qid);
+            if (queue == null)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
+            if (!queueListLiveService.isUserInQueue(queue, user)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("It isn't your queue!");
+            }
+            reviewService.saveReview(new Review(qid, user.getId(), reviewRequest.getRate(), reviewRequest.getDescription(), new Date()));
+            return ResponseEntity.status(200).body("Successfully add review");
+        } catch (Exception exc){
+            exc.printStackTrace();
+            return ResponseEntity.status(404).body("Something went wrong");
+        }
     }
 }

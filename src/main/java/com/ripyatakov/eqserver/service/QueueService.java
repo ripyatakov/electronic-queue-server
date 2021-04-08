@@ -2,8 +2,10 @@ package com.ripyatakov.eqserver.service;
 
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
+import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.repository.QueueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -82,4 +84,20 @@ public class QueueService {
         return repository.findByEqStatus(status);
     }
 
+    public List<Queue> findAllByPage(int pageNumber, int pageSize){
+        return repository.findAll(PageRequest.of(pageNumber, pageSize)).toList();
+    }
+
+    public List<Queue> findAllById(int id){
+        return repository.findAllById(id);
+    }
+    public List<Queue> findAllByEqTitle(String title){
+        return repository.findAllByEqTitleLike("%" + title + "%");
+    }
+    public List<Queue> findAllByEqTypeLike(String type){
+        return repository.findAllByEqTypeLike("%" + type + "%");
+    }
+    public List<Queue> findAllByEqStatusLike(String status){
+        return repository.findAllByEqStatus(status);
+    }
 }

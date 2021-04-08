@@ -1,13 +1,17 @@
 <!DOCTYPE HTML>
 <html xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Менеджер очередей</title>
+    <title>Список пользователей</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-<h2>You</h2>
+<h2>Users</h2>
 <table>
-    <title>You</title>
+    <colgroup>
+        <col span="2" style="background: cyan">
+        <col span="2" style="background: darkseagreen">
+    </colgroup>
+    <title>Users</title>
     <thead>
     <tr>
         <th> id </th>
@@ -28,9 +32,9 @@
     </tr>
     </tbody>
 </table>
-<form action="#" th:action="@{/byName}"  method="post">
-    <p>name: <input type="text" /></p>
-    <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+<form action="#" th:action="@{/start}" th:object="${authenticationRequest}" method="post">
+    <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
+    <p><input type="submit" value="Go back" /></p>
 </form>
 </body>
 </html>

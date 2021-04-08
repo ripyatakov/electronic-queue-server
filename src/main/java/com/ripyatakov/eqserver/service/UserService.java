@@ -3,6 +3,7 @@ package com.ripyatakov.eqserver.service;
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,51 +11,63 @@ import java.util.List;
 @Service
 public class UserService {
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository repository;
 
     public User saveUser(User user){
-        return userRepository.save(user);
+        return repository.save(user);
     }
 
     public List<User> saveUsers(List<User> users){
-        return userRepository.saveAll(users);
+        return repository.saveAll(users);
     }
 
     public User getUserById(int id){
-        return userRepository.findById(id).orElse(null);
+        return repository.findById(id).orElse(null);
     }
     public List<User> getAllUsers(){
-        return userRepository.findAll();
+        return repository.findAll();
     }
 
     public List<User> getUserByName(String name){
-        return userRepository.findByName(name);
+        return repository.findByName(name);
     }
 
     public String deleteUser(int id){
-        userRepository.deleteById(id);
+        repository.deleteById(id);
         return "User deleted " + id;
     }
 
     public User getUserByToken(String token){
-        return userRepository.findByToken(token);
+        return repository.findByToken(token);
     }
 
     public User updateUser(User user){
-        User existingUser = userRepository.findById(user.getId()).orElse(null);
+        User existingUser = repository.findById(user.getId()).orElse(null);
         existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(user.getPassword());
         existingUser.setRole(user.getRole());
         existingUser.setToken(user.getToken());
-        return userRepository.save(existingUser);
+        return repository.save(existingUser);
     }
 
     public User findByEmail(String email){
-        return userRepository.findByEmail(email);
+        return repository.findByEmail(email);
     }
 
     public List<User> findAllByName(String name){
-        return userRepository.findByNameLike(name);
+        return repository.findByNameLike("%" + name + "%");
+    }
+
+    public List<User> findAllById(int id){
+        return repository.findByIdLike(id);
+    }
+
+    public List<User> findAllByRole(String role){
+        return repository.findByRoleLike("%" + role + "%");
+    }
+
+    public List<User> findAllByPage(int pageNumber, int pageSize){
+        return repository.findAll(PageRequest.of(pageNumber, pageSize)).toList();
     }
 }

@@ -24,7 +24,6 @@ public class OnlineQueuesManager {
     private QueueService queueService;
     @Autowired
     private QueueListLiveService queueListLiveService;
-
     @Autowired
     private final OnlineQueueService onlineQueuesService;
 
