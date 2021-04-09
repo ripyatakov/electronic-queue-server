@@ -3,6 +3,7 @@ package com.ripyatakov.eqserver.controller;
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.json.QueueData;
+import com.ripyatakov.eqserver.json.ResponseMessage;
 import com.ripyatakov.eqserver.managers.OnlineQueuesManager;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.CreateQueueRequest;
@@ -53,6 +54,7 @@ public class QueueAdministrationController {
 
     @PostMapping("/createQueue/{type}")
     public ResponseEntity createQueue(@RequestBody CreateQueueRequest createQueueRequest, @PathVariable String type){
+        ResponseMessage responseMessage;
         try {
             User owner = userService.getUserByToken(createQueueRequest.getToken());
             Queue queue = new Queue(0,
@@ -75,7 +77,8 @@ public class QueueAdministrationController {
             return ResponseEntity.status(HttpStatus.OK).body(new QueueData(queue, 0, Hasher.getQueueCode(queue.getId())));
         } catch (Exception exc){
             exc.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Can't create queue");
+            responseMessage = new ResponseMessage("Can't create queue");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMessage);
         }
 
     }
@@ -86,38 +89,47 @@ public class QueueAdministrationController {
     }
     @PostMapping("/next/{qid}")
     public ResponseEntity next(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
+        ResponseMessage responseMessage;
         try {
             User user = userService.getUserByToken(authenticationRequest.getToken());
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
             if (user == null)
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Somebody was authorized by your password");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
             Queue queue = queueService.getQueueById(qid);
+            responseMessage = new ResponseMessage("No such queue found");
             if (queue == null)
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            responseMessage = new ResponseMessage("You are not an owner!");
             if (queue.getEqOwnerId() != user.getId()){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are not an owner!");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             int uid = onlineQueueService.nextUser(queue);
+            responseMessage = new ResponseMessage("No more users in queue or queue not started");
             if (uid == -1){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No more users in queue or queue not started");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             } else{
                 return ResponseEntity.status(200).body(userService.getUserById(uid));
             }
         } catch (Exception exc){
             exc.printStackTrace();
-            return ResponseEntity.status(404).body("Something went wrong");
+            responseMessage = new ResponseMessage("No more users in queue or queue not started");
+            return ResponseEntity.status(404).body(responseMessage);
         }
     }
 
     @PostMapping("/myAdminsQueues")
     public ResponseEntity myAdminsQueues(@RequestBody AuthenticationRequest authenticationRequest) {
+        ResponseMessage responseMessage;
         try {
             User user = userService.getUserByToken(authenticationRequest.getToken());
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
             if (user == null)
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Somebody was authorized by your password");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
             return ResponseEntity.status(200).body(getQueueDatas(queueService.getQueuesByOwnerId(user.getId())));
         } catch (Exception exc){
             exc.printStackTrace();
-            return ResponseEntity.status(404).body("Something went wrong");
+            responseMessage = new ResponseMessage("No more users in queue or queue not started");
+            return ResponseEntity.status(404).body(responseMessage);
         }
     }
 }

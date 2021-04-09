@@ -1,6 +1,7 @@
 package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.json.ResponseMessage;
 import com.ripyatakov.eqserver.requests.AuthorizationRequest;
 import com.ripyatakov.eqserver.service.Hasher;
 import com.ripyatakov.eqserver.service.TokenGenerator;
@@ -38,7 +39,9 @@ public class AuthorizationController {
     }
 
     private ResponseEntity register(String role, AuthorizationRequest registrationRequest){
+        ResponseMessage responseMessage;
         try {
+
             registrationRequest.setPassword(Hasher.sha256(registrationRequest.getPassword()));
             String token = TokenGenerator.getToken(registrationRequest.getEmail(), registrationRequest.getPassword());
             User newUser = new User(0, registrationRequest.getName(),
@@ -51,12 +54,14 @@ public class AuthorizationController {
         }
         catch (Exception exc){
             exc.printStackTrace();
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Existing email");
+            responseMessage = new ResponseMessage("Existing email");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMessage);
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody AuthorizationRequest loginRequest){
+        ResponseMessage responseMessage;
         try {
             User user = userService.findByEmail(loginRequest.getEmail());
             loginRequest.setPassword(Hasher.sha256(loginRequest.getPassword()));
@@ -65,13 +70,15 @@ public class AuthorizationController {
                 user.setToken(token);
                 user = userService.updateUser(user);
             } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Wrong password");
+                responseMessage = new ResponseMessage("Wrong password");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseMessage);
             }
             return ResponseEntity.status(HttpStatus.OK).body(user);
         }
         catch (Exception exc){
             exc.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No such email found");
+            responseMessage = new ResponseMessage("No such email found");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
         }
 
     }
