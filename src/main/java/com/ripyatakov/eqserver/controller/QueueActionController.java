@@ -30,6 +30,10 @@ public class QueueActionController {
     @Autowired
     private ReviewService reviewService;
 
+    private QueueData getQueueData(Queue queue){
+        return new QueueData(queue, (int)queueListLiveService.queueSize(queue), Hasher.getQueueCode(queue.getId()));
+    }
+
     private User getUser(AuthenticationRequest authenticationRequest) {
         return userService.getUserByToken(authenticationRequest.getToken());
     }
@@ -136,7 +140,7 @@ public class QueueActionController {
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No such queue found");
 
-            return ResponseEntity.status(200).body(queue);
+            return ResponseEntity.status(200).body(getQueueData(queue));
         } catch (Exception exc) {
             exc.printStackTrace();
             return ResponseEntity.status(404).body("Something went wrong");

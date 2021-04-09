@@ -6,10 +6,7 @@ import com.ripyatakov.eqserver.json.QueueData;
 import com.ripyatakov.eqserver.managers.OnlineQueuesManager;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.CreateQueueRequest;
-import com.ripyatakov.eqserver.service.Hasher;
-import com.ripyatakov.eqserver.service.OnlineQueueService;
-import com.ripyatakov.eqserver.service.QueueService;
-import com.ripyatakov.eqserver.service.UserService;
+import com.ripyatakov.eqserver.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class QueueAdministrationController {
@@ -28,7 +26,20 @@ public class QueueAdministrationController {
     @Autowired
     private QueueService queueService;
     @Autowired
+    private QueueListLiveService queueListLiveService;
+    @Autowired
     private OnlineQueueService onlineQueueService;
+
+    private List<QueueData> getQueueDatas(List<Queue> queues){
+        return
+                queues.stream()
+                .map(a -> new QueueData(a,(int)queueListLiveService.queueSize(a), Hasher.getQueueCode(a.getId()) ))
+                .collect(Collectors.toList());
+    }
+
+    private QueueData getQueueData(Queue queue){
+        return new QueueData(queue, (int)queueListLiveService.queueSize(queue), Hasher.getQueueCode(queue.getId()));
+    }
 
     private boolean queueToOnline(Queue queue){
         return ((queue.getEqDateStart().getTime()/1000/60/60/24 == (new Date()).getTime()/1000/60/60/24) ||
@@ -97,5 +108,16 @@ public class QueueAdministrationController {
         }
     }
 
-
+    @PostMapping("/myAdminsQueues")
+    public ResponseEntity myAdminsQueues(@RequestBody AuthenticationRequest authenticationRequest) {
+        try {
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Somebody was authorized by your password");
+            return ResponseEntity.status(200).body(getQueueDatas(queueService.getQueuesByOwnerId(user.getId())));
+        } catch (Exception exc){
+            exc.printStackTrace();
+            return ResponseEntity.status(404).body("Something went wrong");
+        }
+    }
 }

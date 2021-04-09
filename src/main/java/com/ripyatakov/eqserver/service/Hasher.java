@@ -3,6 +3,7 @@ package com.ripyatakov.eqserver.service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 public class Hasher {
     private static int base = 36;
@@ -25,6 +26,7 @@ public class Hasher {
         return Integer.toString(qid, base);
     }
     public static int getQId(String code){
+        code = code.toLowerCase(Locale.ROOT);
         int qid = Integer.parseInt(code, base);
         qid = ((qid - offset) / multCoef) >> bitCoef;
         return qid;

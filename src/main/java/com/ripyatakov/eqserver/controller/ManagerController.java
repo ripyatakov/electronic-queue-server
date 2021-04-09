@@ -29,6 +29,8 @@ public class ManagerController {
     private QueueListLiveService queueListLiveService;
     @Autowired
     private QueryManager queryManager;
+    @Autowired
+    private ReviewService reviewService;
 
     @RequestMapping(value = "/mlogin", method = RequestMethod.GET)
     public String login(Model model) {
@@ -107,6 +109,7 @@ public class ManagerController {
                 usersInQueue.add(new UserInQueue(quser.getId(), r.getEqNumber(), quser.getName()));
             }
             model.addAttribute("queue", queue);
+            model.addAttribute("queueRate", reviewService.getAverageRating(queue));
             model.addAttribute("usersInQueue", usersInQueue);
             return "usersInQueue";
         } catch (Exception exc){

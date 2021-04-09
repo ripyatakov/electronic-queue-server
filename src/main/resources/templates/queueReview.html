@@ -1,8 +1,8 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Список пользователей</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta charset="UTF-8">
+    <title>Title</title>
 </head>
 <body>
 <h2>Queue</h2>
@@ -44,13 +44,13 @@
     </tr>
     </tbody>
 </table>
-<h3>Users</h3>
+<h3>Reviews</h3>
 <table>
     <colgroup>
         <col span="1" style="background: cyan">
         <col span="2" style="background: darkseagreen">
     </colgroup>
-    <title>Users</title>
+    <title>Reviews</title>
     <thead>
     <tr>
         <th> id </th>
@@ -59,13 +59,13 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:if="${usersInQueue.empty}">
+    <tr th:if="${queueReviews.empty}">
         <td colspan="2"> No Users Available </td>
     </tr>
-    <tr th:each="user : ${usersInQueue}">
-        <td><span th:text="${user.id}"> id </span></td>
-        <td><span th:text="${user.queuePlace}"> queuePlace </span></td>
-        <td><span th:text="${user.name}"> name </span></td>
+    <tr th:each="review : ${queueReviews}">
+        <td><span th:text="${review.id}"> id </span></td>
+        <td><span th:text="${review.queuePlace}"> queuePlace </span></td>
+        <td><span th:text="${review.name}"> name </span></td>
     </tr>
     </tbody>
 </table>
