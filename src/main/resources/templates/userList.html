@@ -25,7 +25,13 @@
         <td colspan="2"> No Users Available </td>
     </tr>
     <tr th:each="user : ${userList}">
-        <td><span th:text="${user.id}"> id </span></td>
+        <td>
+            <!--<span th:text="${user.id}"> id </span> -->
+            <form action="#" th:action="@{/userReview/{uid}(uid=${user.id})}" th:object="${authenticationRequest}" method="post">
+                <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
+                <p><input type="submit" th:value="${user.id}" /></p>
+            </form>
+        </td>
         <td><span th:text="${user.name}"> name </span></td>
         <td><span th:text="${user.email}"> email </span></td>
         <td><span th:text="${user.role}"> role </span></td>
@@ -34,7 +40,7 @@
 </table>
 <form action="#" th:action="@{/start}" th:object="${authenticationRequest}" method="post">
     <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
-    <p><input type="submit" value="Go back" /></p>
+    <p><input type="submit" value="Back to query" /></p>
 </form>
 </body>
 </html>

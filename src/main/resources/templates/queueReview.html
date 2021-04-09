@@ -48,24 +48,32 @@
 <table>
     <colgroup>
         <col span="1" style="background: cyan">
-        <col span="2" style="background: darkseagreen">
+        <col span="3" style="background: darkseagreen">
     </colgroup>
     <title>Reviews</title>
     <thead>
     <tr>
-        <th> id </th>
-        <th> queuePlace </th>
         <th> name </th>
+        <th> description </th>
+        <th> rate </th>
+        <th> time </th>
     </tr>
     </thead>
     <tbody>
     <tr th:if="${queueReviews.empty}">
-        <td colspan="2"> No Users Available </td>
+        <td colspan="2"> No reviews here </td>
     </tr>
     <tr th:each="review : ${queueReviews}">
-        <td><span th:text="${review.id}"> id </span></td>
-        <td><span th:text="${review.queuePlace}"> queuePlace </span></td>
-        <td><span th:text="${review.name}"> name </span></td>
+        <td>
+            <!-- <span th:text="${review.userName}"> userName </span> -->
+            <form action="#" th:action="@{/userReview/{uid}(uid=${review.uid})}" th:object="${authenticationRequest}" method="post">
+                <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
+                <p><input type="submit" th:value="${review.userName}" /></p>
+            </form>
+        </td>
+        <td><span th:text="${review.description}"> description </span></td>
+        <td><span th:text="${review.rate}"> rate </span></td>
+        <td><span th:text="${review.time}"> time </span></td>
     </tr>
     </tbody>
 </table>

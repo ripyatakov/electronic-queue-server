@@ -40,7 +40,14 @@
         <td><span th:text="${queue.eqDateStart}"> dateStart </span></td>
         <td><span th:text="${queue.eqDateEnd}"> dateEnd </span></td>
         <td><span th:text="${queue.eqType}"> type </span></td>
-        <td><span th:text="${queueRate}"> rate </span></td>
+        <td>
+            <!--<span th:text="${queueRate}"> rate </span> -->
+            <form action="#" th:action="@{/queueReview/{qid}(qid=${queue.id})}" th:object="${authenticationRequest}" method="post">
+                <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
+                <p><input type="submit" th:value="${queueRate}" /></p>
+            </form>
+
+        </td>
     </tr>
     </tbody>
 </table>

@@ -2,7 +2,9 @@ package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
+import com.ripyatakov.eqserver.entity.Review;
 import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.html.ReviewHtml;
 import com.ripyatakov.eqserver.json.UserInQueue;
 import com.ripyatakov.eqserver.managers.QueryManager;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class ManagerController {
@@ -31,6 +34,12 @@ public class ManagerController {
     private QueryManager queryManager;
     @Autowired
     private ReviewService reviewService;
+
+    private List<ReviewHtml> toReviewHtml(List<Review> reviews){
+        return reviews.stream()
+                .map(a -> new ReviewHtml(a.getRwQId(),a.getRwUId(),userService.getUserById(a.getRwUId()).getName(), a.getDescription(), a.getRate(), a.getTime()))
+                .collect(Collectors.toList());
+    }
 
     @RequestMapping(value = "/mlogin", method = RequestMethod.GET)
     public String login(Model model) {
@@ -109,9 +118,51 @@ public class ManagerController {
                 usersInQueue.add(new UserInQueue(quser.getId(), r.getEqNumber(), quser.getName()));
             }
             model.addAttribute("queue", queue);
-            model.addAttribute("queueRate", reviewService.getAverageRating(queue));
+            model.addAttribute("queueRate", String.format("%.2f", reviewService.getAverageRating(queue)));
             model.addAttribute("usersInQueue", usersInQueue);
             return "usersInQueue";
+        } catch (Exception exc){
+            exc.printStackTrace();
+
+        }
+        return "errorPage";
+    }
+
+    @PostMapping("/queueReview/{qid}")
+    public String queueReview(@ModelAttribute AuthenticationRequest authenticationRequest, @PathVariable int qid, Model model){
+        try {
+            model.addAttribute("authenticationRequest", authenticationRequest);
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            List<User> userList = new ArrayList<>();
+            if (!user.getRole().equals("manager")) {
+                return "errorPage";
+            }
+            Queue queue = queueService.getQueueById(qid);
+
+            model.addAttribute("queue", queue);
+            model.addAttribute("queueRate", String.format("%.2f", reviewService.getAverageRating(queue)));
+            model.addAttribute("queueReviews", toReviewHtml(reviewService.findAllByQid(qid)));
+            return "queueReview";
+        } catch (Exception exc){
+            exc.printStackTrace();
+
+        }
+        return "errorPage";
+    }
+    @PostMapping("/userReview/{uid}")
+    public String userReview(@ModelAttribute AuthenticationRequest authenticationRequest, @PathVariable int uid, Model model){
+        try {
+            model.addAttribute("authenticationRequest", authenticationRequest);
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            List<User> userList = new ArrayList<>();
+            if (!user.getRole().equals("manager")) {
+                return "errorPage";
+            }
+            User user1 = userService.getUserById(uid);
+
+            model.addAttribute("user", user1);
+            model.addAttribute("userReviews", toReviewHtml(reviewService.findAllByUid(uid)));
+            return "userReview";
         } catch (Exception exc){
             exc.printStackTrace();
 
