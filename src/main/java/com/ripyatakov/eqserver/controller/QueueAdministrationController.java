@@ -198,4 +198,67 @@ public class QueueAdministrationController {
             return ResponseEntity.status(404).body(responseMessage);
         }
     }
+    @PostMapping("/registerWithoutQueue/{qid}")
+    public ResponseEntity registerWithoutQueue(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
+        ResponseMessage responseMessage;
+        try {
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
+            Queue queue = queueService.getQueueById(qid);
+            responseMessage = new ResponseMessage("No such queue found");
+            if (queue == null)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+
+            responseMessage = new ResponseMessage("Action not allowed for you");
+            if (!user.getRole().equals("manager") && !user.getRole().equals("admin")){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+            User anon = userService.registerAnonym();
+            boolean res = onlineQueueService.registerWithoutQueue(queue, anon);
+            if (res){
+                return ResponseEntity.status(HttpStatus.OK).body(anon);
+            } else{
+                responseMessage = new ResponseMessage("Cant create anon");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+        } catch (Exception exc){
+            exc.printStackTrace();
+            responseMessage = new ResponseMessage("No more users in queue or queue not started");
+            return ResponseEntity.status(404).body(responseMessage);
+        }
+    }
+
+    @PostMapping("/registerAnonim/{qid}")
+    public ResponseEntity registerAnonim(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
+        ResponseMessage responseMessage;
+        try {
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
+            Queue queue = queueService.getQueueById(qid);
+            responseMessage = new ResponseMessage("No such queue found");
+            if (queue == null)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+
+            responseMessage = new ResponseMessage("Action not allowed for you");
+            if (!user.getRole().equals("manager") && !user.getRole().equals("admin")){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+            User anon = userService.registerAnonym();
+            QueueData res = onlineQueueService.registerForQueue(queue, anon);
+            if (res != null ){
+                return ResponseEntity.status(HttpStatus.OK).body(res);
+            } else{
+                responseMessage = new ResponseMessage("Cant create anon");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+        } catch (Exception exc){
+            exc.printStackTrace();
+            responseMessage = new ResponseMessage("No more users in queue or queue not started");
+            return ResponseEntity.status(404).body(responseMessage);
+        }
+    }
 }

@@ -124,4 +124,11 @@ public class OnlineQueueService {
         }
         return answ;
     }
+
+    public synchronized boolean registerWithoutQueue(Queue queue, User user){
+        if (!isOnline(queue))
+            return false;
+        onlineQueues.get(queue.getId()).registerWithoutQueue(user);
+        return true;
+    }
 }

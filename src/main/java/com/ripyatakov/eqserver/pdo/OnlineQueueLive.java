@@ -83,7 +83,7 @@ public class OnlineQueueLive implements OnlineQueue {
     public synchronized QueueData registerForQueue(User user) {
         try {
             synchronized (queue) {
-                QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), getNewEqNumber(), new Date(), 0, null);
+                QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), getNewEqNumber(), new Date(), 0, new Date());
                 if (queue.size() >= queueInfo.getEqMaxUsers() || queue.contains(newRecord))
                     return null;
                 queue.add(newRecord);
@@ -208,11 +208,31 @@ public class OnlineQueueLive implements OnlineQueue {
     @Override
     public synchronized void update(){
         synchronized (toDelete) {
-            toDelete.clear();
-            toDelete = Collections.synchronizedList(new ArrayList<>());
-            updated = false;
+            synchronized (queue) {
+                toDelete.clear();
+                toDelete = Collections.synchronizedList(new ArrayList<>());
+                updated = false;
+            }
         }
     }
+
+    public synchronized void registerWithoutQueue(User user){
+        int cur = queueInfo.getEqCurrentUser();
+        synchronized (queue) {
+            updated = true;
+            if (queue.size() <= cur) {
+                registerForQueue(user);
+                return;
+            }
+            for (int i = cur; i < queue.size(); i++) {
+                queue.get(i).setEqNumber(queue.get(i).getEqNumber() + 1);
+            }
+            QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), queue.get(cur).getEqNumber() - 1,
+                    new Date(), 0, new Date());
+            queue.add(cur, newRecord);
+        }
+    }
+
 
     private synchronized int getNewEqNumber() {
         synchronized (queue) {

@@ -21,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findByIdLike(int id);
 
     List<User> findByRoleLike(String role);
+
+    User findFirstByRoleOrderByIdDesc(String role);
 }

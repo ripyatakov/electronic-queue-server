@@ -32,7 +32,7 @@ public class QueueListLiveService {
             int eqNumber = 0;
             if (q != null)
                 eqNumber = q.getEqNumber() + 1;
-            QueueListLive newRecord = new QueueListLive(queue.getId(), user.getId(),eqNumber, queue.getEqDateStart(), 0, null);
+            QueueListLive newRecord = new QueueListLive(queue.getId(), user.getId(),eqNumber, queue.getEqDateStart(), 0, new Date());
             repository.save(newRecord);
             return queue;
         }
