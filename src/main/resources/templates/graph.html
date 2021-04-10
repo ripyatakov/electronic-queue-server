@@ -10,21 +10,63 @@
     <div id="plt"></div>
     <script th:inline="javascript">
         TESTER = document.getElementById('plt');
-        var number = [[${number}]];
         /*<![CDATA[*/
+        var number = [[${number}]];
+        var Title = [[${title}]];
+        var xName = [[${xName}]];
+        var yName = [[${yName}]];
+
         var X = [[${X}]];
         var Y = [[${Y}]];
+        var Type = [[${Type}]];
         /*]]>*/
         var data = [
             {
                 x: X,
                 y: Y,
-                type: 'scatter'
+                type: Type
             }
         ];
+        var layout = {
+            height: 600,
+            title: {
+                text:Title,
+                font: {
+                    family: 'Courier New, monospace',
+                    size: 24
+                },
+                xref: 'paper',
+                x: 0.05,
+            },
+            xaxis: {
+                title: {
+                    text: xName,
+                    font: {
+                        family: 'Courier New, monospace',
+                        size: 18,
+                        color: '#7f7f7f'
+                    }
+                },
+            },
+            yaxis: {
+                title: {
+                    text: yName,
+                    font: {
+                        family: 'Courier New, monospace',
+                        size: 18,
+                        color: '#7f7f7f'
+                    }
+                }
+            }
+        };
 
-        Plotly.newPlot("plt", data);
+
+        Plotly.newPlot("plt", data, layout);
     </script>
 </div>
+<form action="#" th:action="@{/start}" th:object="${authenticationRequest}" method="post">
+    <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
+    <p><input type="submit" value="Back to query" /></p>
+</form>
 </body>
 </html>

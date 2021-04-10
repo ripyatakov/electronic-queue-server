@@ -1,11 +1,9 @@
 package com.ripyatakov.eqserver.managers;
 
 import com.ripyatakov.eqserver.entity.Queue;
+import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
-import com.ripyatakov.eqserver.service.OnlineQueueService;
-import com.ripyatakov.eqserver.service.QueueListLiveService;
-import com.ripyatakov.eqserver.service.QueueService;
-import com.ripyatakov.eqserver.service.UserService;
+import com.ripyatakov.eqserver.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,6 +13,7 @@ import org.springframework.ui.Model;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +27,8 @@ public class QueryManager {
     private QueueListLiveService queueListLiveService;
     @Autowired
     private final OnlineQueueService onlineQueuesService;
+    @Autowired
+    private final ReviewService reviewService;
 
     private List<String> commands;
 
@@ -36,6 +37,12 @@ public class QueryManager {
     private List<String> userParams;
 
     private List<String> queueParams;
+
+    private List<String> statParams;
+
+    private List<String> statObjects;
+
+
 
     @PostConstruct
     private void init() {
@@ -59,6 +66,17 @@ public class QueryManager {
         queueParams.add("ownerId");
         queueParams.add("type");
         queueParams.add("status");
+
+        statObjects = new ArrayList<>();
+        statObjects.add("waitingTime");
+        statObjects.add("count");
+        statObjects.add("rate");
+        statObjects.add("usersInQueues");
+
+
+        statParams = new ArrayList<>();
+        statParams.add("ownerId");
+        statParams.add("queueId");
 
     }
 
@@ -157,7 +175,148 @@ public class QueryManager {
     }
 
     private String executeStat(List<String> params, Model model){
-        return null;
+        params.add("ownerId");
+        params.add("23");
+        String obj = params.get(1);
+        String param = params.get(2);
+        String value = params.get(3);
+        if (!statObjects.contains(obj) || !statParams.contains(param))
+            throw new IllegalArgumentException();
+        if (obj.equals(statObjects.get(0))){
+            //averageWaitingTime
+            if (param.equals(statParams.get(0))){
+                //ownerId
+                int val = Integer.parseInt(value);
+                List<Queue> queues = queueService.getQueuesByOwnerId(val);
+                queues.sort(new Comparator<Queue>() {
+                    @Override
+                    public int compare(Queue o1, Queue o2) {
+                        return new Integer(o1.getId()).compareTo(o2.getId());
+                    }
+                });
+                List<Integer> X = queues.stream().map(a -> a.getId()).collect(Collectors.toList());
+                List<Double> Y = queues.stream().map(a -> a.getEqAverageWaitingTime()).collect(Collectors.toList());
+                String title = "Statistic serve time by owner id";
+                String xName = "queue id";
+                String yName = "average serve time";
+                model.addAttribute("title", title);
+                model.addAttribute("xName", xName);
+                model.addAttribute("Type", "scatter");
+                model.addAttribute("yName", yName);
+                model.addAttribute("X", X);
+                model.addAttribute("Y", Y);
+            }
+            if (param.equals(statParams.get(1))){
+                //queueId
+                int val = Integer.parseInt(value);
+                List<QueueListLive> records = queueListLiveService.getQueueRecordings(val);
+                List<Date> X = records.stream().map(a -> a.getEqStartServeTime()).collect(Collectors.toList());
+                List<Float> Y = records.stream()
+                        .map(
+                        a -> (float)((a.getEqStartServeTime().getTime() - a.getEqEnterTime().getTime())/1000.0/60.0) - a.getEqServeTimeMin()
+                )
+                        .map(a -> (a< 0)?0:a )
+                        .collect(Collectors.toList());
+                String title = "Waiting time";
+                String xName = "time start user serving";
+                String yName = "waiting time";
+                model.addAttribute("title", title);
+                model.addAttribute("xName", xName);
+                model.addAttribute("Type", "scatter");
+                model.addAttribute("yName", yName);
+                model.addAttribute("X", X);
+                model.addAttribute("Y", Y);
+            }
+        }
+        if (obj.equals(statObjects.get(1))){
+            //count
+            if (param.equals(statParams.get(0))){
+                //ownerId
+                int val = Integer.parseInt(value);
+                List<Queue> queues = queueService.getQueuesByOwnerId(val);
+                queues.sort(new Comparator<Queue>() {
+                    @Override
+                    public int compare(Queue o1, Queue o2) {
+                        return new Integer(o1.getId()).compareTo(o2.getId());
+                    }
+                });
+                //queueListLiveService.queueSize();
+                List<Integer> X = queues.stream().map(a -> a.getId()).collect(Collectors.toList());
+                List<Integer> Y = queues.stream().map(a -> (int)queueListLiveService.queueSize(a)).collect(Collectors.toList());
+                String title = "Statistic by owner id";
+                String xName = "queue id";
+                String yName = "amount registered users";
+                model.addAttribute("title", title);
+                model.addAttribute("xName", xName);
+                model.addAttribute("yName", yName);
+                model.addAttribute("Type", "scatter");
+                model.addAttribute("X", X);
+                model.addAttribute("Y", Y);
+            }
+            if (param.equals(statParams.get(1))){
+                //queueId
+                int val = Integer.parseInt(value);
+                List<String> X = new ArrayList<>();
+                for (int i = 0; i < 24; i++) {
+                    if (new Integer(i).toString().length() < 2){
+                        X.add("0" + i+ ":00");
+                    } else
+                        X.add(i + ":00");
+                }
+                List<Integer> Y = queueListLiveService.usersRegistersByHours(val);
+                String title = "Registered users statistic";
+                String xName = "time";
+                String yName = "count registered users";
+                model.addAttribute("title", title);
+                model.addAttribute("xName", xName);
+                model.addAttribute("Type", "bar");
+                model.addAttribute("yName", yName);
+                model.addAttribute("X", X);
+                model.addAttribute("Y", Y);
+            }
+        }
+        if (obj.equals(statObjects.get(2))) {
+            //rate
+            if (param.equals(statParams.get(0))){
+                //ownerId
+                int val = Integer.parseInt(value);
+                List<Queue> queues = queueService.getQueuesByOwnerId(val);
+                queues.sort(new Comparator<Queue>() {
+                    @Override
+                    public int compare(Queue o1, Queue o2) {
+                        return new Integer(o1.getId()).compareTo(o2.getId());
+                    }
+                });
+
+                List<Integer> X = queues.stream().map(a -> a.getId()).collect(Collectors.toList());
+                List<Double> Y = queues.stream().map(a ->  reviewService.getAverageRating(a)).collect(Collectors.toList());
+                String title = "Statistic average rating by queues";
+                String xName = "queue id";
+                String yName = "average rating";
+                model.addAttribute("title", title);
+                model.addAttribute("xName", xName);
+                model.addAttribute("Type", "bar");
+                model.addAttribute("yName", yName);
+                model.addAttribute("X", X);
+                model.addAttribute("Y", Y);
+            }
+        }
+        if (obj.equals(statObjects.get(3))){
+            int val = Integer.parseInt(value);
+            List<Queue> allQueues = queueService.getAllQueues();
+            List<Integer> Y = allQueues.stream().map(a -> (int)queueListLiveService.queueSize(a)).collect(Collectors.toList());
+            List<Integer> X = allQueues.stream().map(a -> a.getId()).collect(Collectors.toList());
+            String title = "Registered users statistic";
+            String xName = "queue id";
+            String yName = "amount registered users";
+            model.addAttribute("title", title);
+            model.addAttribute("xName", xName);
+            model.addAttribute("Type", "bar");
+            model.addAttribute("yName", yName);
+            model.addAttribute("X", X);
+            model.addAttribute("Y", Y);
+        }
+        return "graph";
     }
 
     private List<String> formatString(String query) {

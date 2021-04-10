@@ -7,6 +7,9 @@ import com.ripyatakov.eqserver.repository.QueueListLiveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -68,7 +71,9 @@ public class QueueListLiveService {
     public List<QueueListLive> getQueueRecordings(Queue queue){
         return repository.findByEqQId(queue.getId());
     }
-
+    public List<QueueListLive> getQueueRecordings(int qid){
+        return repository.findByEqQId(qid);
+    }
     public int usersBeforeMe(Queue queue, User user){
         QueueListLive user1 = repository.findByEqQIdAndEqUId(queue.getId(), user.getId());
         return (int) repository.countByEqNumberLessThanAndEqQId(user1.getEqNumber(), queue.getId());
@@ -77,5 +82,23 @@ public class QueueListLiveService {
     public boolean isUserInQueue(Queue queue, User user){
         QueueListLive queueListLive = repository.findByEqQIdAndEqUId(queue.getId(), user.getId());
         return queueListLive != null;
+    }
+    public List<Integer> usersRegistersByHours(int qid){
+        List<Integer> lst = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        Date d1 = calendar.getTime();
+        Date d2 = new Date(d1.getTime() + 60*60*1000);
+        for (int i = 0; i < 24; i++) {
+            lst.add((int)repository.countByEqEnterTimeBetweenAndEqQId(d1,d2,qid));
+            d1 = d2;
+            d2 = new Date(d1.getTime() + 60*60*1000);
+        }
+        return lst;
     }
 }

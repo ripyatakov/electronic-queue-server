@@ -5,6 +5,7 @@ import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.id_classes.QueueListLiveId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Date;
 import java.util.List;
 
 public interface QueueListLiveRepository extends JpaRepository<QueueListLive, QueueListLiveId> {
@@ -22,4 +23,6 @@ public interface QueueListLiveRepository extends JpaRepository<QueueListLive, Qu
     QueueListLive findFirstByEqNumberGreaterThanAndEqQIdOrderByEqNumber(int eqNumber, int eqQId);
 
     long countByEqNumberLessThanAndEqQId(int eqNumber, int eqQId);
+
+    long countByEqEnterTimeBetweenAndEqQId(Date d1, Date d2, int eqQId);
 }
