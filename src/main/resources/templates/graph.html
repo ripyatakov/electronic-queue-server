@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="plotly-latest.min.js"></script>
+    <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+</head>
+<body>
+<div class="wrapper">
+    <div id="plt"></div>
+    <script th:inline="javascript">
+        TESTER = document.getElementById('plt');
+        var number = [[${number}]];
+        /*<![CDATA[*/
+        var X = [[${X}]];
+        var Y = [[${Y}]];
+        /*]]>*/
+        var data = [
+            {
+                x: X,
+                y: Y,
+                type: 'scatter'
+            }
+        ];
+
+        Plotly.newPlot("plt", data);
+    </script>
+</div>
+</body>
+</html>

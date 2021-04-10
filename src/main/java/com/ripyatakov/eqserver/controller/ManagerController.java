@@ -169,4 +169,24 @@ public class ManagerController {
         }
         return "errorPage";
     }
+    @GetMapping("/abcd")
+    public String abc(Model model){
+        List<Integer> lstY = new ArrayList<>();
+        lstY.add(2);
+        lstY.add(16);
+        lstY.add(-3);
+        lstY.add(5);
+        lstY.add(6);
+        model.addAttribute("Y", lstY);
+
+        List<String> lstX = new ArrayList<>();
+        lstX.add("2013-8-04 22:23:00");
+        lstX.add("2013-9-04 22:23:00");
+        lstX.add("2013-10-04 22:23:00");
+        lstX.add("2013-11-04 22:23:00");
+        lstX.add("2013-12-04 22:23:00");
+        model.addAttribute("X", lstX);
+
+        return "graph";
+    }
 }

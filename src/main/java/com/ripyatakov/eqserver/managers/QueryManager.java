@@ -42,6 +42,7 @@ public class QueryManager {
         commands = new ArrayList<>();
         commands.add("get");
         commands.add("search");
+        commands.add("stat");
 
         objects = new ArrayList<>();
         objects.add("users");
@@ -70,7 +71,10 @@ public class QueryManager {
             } else
                 if (commands.get(1).equals(queryParts.get(0))){
                     return executeSearch(queryParts, model);
-                }
+                } else
+                    if (commands.get(2).equals(queryParts.get(0))){
+                        return executeStat(queryParts, model);
+                    }
         } catch (Exception exc) {
             return "errorPage";
         }
@@ -149,6 +153,10 @@ public class QueryManager {
             model.addAttribute("queueList", queueList);
             return "queueList";
         }
+        return null;
+    }
+
+    private String executeStat(List<String> params, Model model){
         return null;
     }
 

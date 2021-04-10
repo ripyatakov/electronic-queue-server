@@ -34,6 +34,9 @@ public class OnlineQueueLive implements OnlineQueue {
             queueInfo.setEqCurrentUser(queue.size());
             updated = true;
         }
+        if (queue.isEmpty()){
+            isBreak = true;
+        }
         this.toDelete = Collections.synchronizedList(new ArrayList<>());
     }
 
@@ -80,13 +83,14 @@ public class OnlineQueueLive implements OnlineQueue {
     public synchronized QueueData registerForQueue(User user) {
         try {
             synchronized (queue) {
-                QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), getNewEqNumber());
+                QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), getNewEqNumber(), new Date(), 0, null);
                 if (queue.size() >= queueInfo.getEqMaxUsers() || queue.contains(newRecord))
                     return null;
                 queue.add(newRecord);
                 updated = true;
                 if (isBreak){
                     lastVisit = new Date();
+                    newRecord.setEqStartServeTime(lastVisit);
                 }
                 isBreak = false;
                 return new QueueData(queueInfo, usersBefore(user), Hasher.getQueueCode(queueInfo.getId()));
@@ -145,9 +149,16 @@ public class OnlineQueueLive implements OnlineQueue {
      * cui can be queue.size() it means that queue is empty but ready for serve new user
      * @return
      */
+    private float getMinutes(long time){
+        return (float)(time / 1000.0 / 60);
+    }
     @Override
     public synchronized int nextUser() {
         int cui = queueInfo.getEqCurrentUser() + 1;
+        if (queue.size() > queueInfo.getEqCurrentUser()){
+            queue.get(queueInfo.getEqCurrentUser()).setEqServeTimeMin(getMinutes(new Date().getTime() - lastVisit.getTime()));
+            updated = true;
+        }
         if (cui < 0 || cui > queue.size())
             return -1;
         queueInfo.setEqCurrentUser(cui);
@@ -155,10 +166,12 @@ public class OnlineQueueLive implements OnlineQueue {
         long secondsBetweenVisits = ((new Date()).getTime() - lastVisit.getTime())/1000;
         queueInfo.setEqAverageWaitingTime((queueInfo.getEqAverageWaitingTime()*(queueInfo.getEqCurrentUser()+1) +
                 secondsBetweenVisits/60.0)/((queueInfo.getEqCurrentUser()+2)));
-
+        lastVisit = new Date();
         if (queueInfo.getEqCurrentUser() == queue.size()) {
             isBreak = true;
             return -2;
+        } else{
+            queue.get(queueInfo.getEqCurrentUser()).setEqStartServeTime(new Date());
         }
         synchronized (queue) {
             updated = true;
@@ -178,7 +191,7 @@ public class OnlineQueueLive implements OnlineQueue {
     @Override
     public synchronized int currentUser() {
         if (queueInfo.getEqCurrentUser() < 0 || queueInfo.getEqCurrentUser() >= queue.size())
-            return -1;
+            return -2;
         return queue.get(queueInfo.getEqCurrentUser()).getEqUId();
     }
 

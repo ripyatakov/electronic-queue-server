@@ -90,6 +90,12 @@ public class OnlineQueueService {
         return onlineQueues.get(queue.getId()).nextUser();
     }
 
+    public synchronized int currentUser(Queue queue){
+        if (!isOnline(queue))
+            return -1;
+        return onlineQueues.get(queue.getId()).currentUser();
+    }
+
     public synchronized List<Queue> myOnlineQueues(User user){
         List<Queue> answ = new ArrayList<>();
         for (OnlineQueueLive q: onlineQueues.values()){

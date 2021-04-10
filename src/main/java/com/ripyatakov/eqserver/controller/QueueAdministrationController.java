@@ -1,9 +1,11 @@
 package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.Queue;
+import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.json.QueueData;
 import com.ripyatakov.eqserver.json.ResponseMessage;
+import com.ripyatakov.eqserver.json.UserInQueue;
 import com.ripyatakov.eqserver.managers.OnlineQueuesManager;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.CreateQueueRequest;
@@ -126,6 +128,70 @@ public class QueueAdministrationController {
             if (user == null)
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
             return ResponseEntity.status(200).body(getQueueDatas(queueService.getQueuesByOwnerId(user.getId())));
+        } catch (Exception exc){
+            exc.printStackTrace();
+            responseMessage = new ResponseMessage("No more users in queue or queue not started");
+            return ResponseEntity.status(404).body(responseMessage);
+        }
+    }
+    @PostMapping("/currentUser/{qid}")
+    public ResponseEntity currentUser(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
+        ResponseMessage responseMessage;
+        try {
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
+            Queue queue = queueService.getQueueById(qid);
+            responseMessage = new ResponseMessage("No such queue found");
+            if (queue == null)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            responseMessage = new ResponseMessage("You are not an owner!");
+            if (queue.getEqOwnerId() != user.getId()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+            int uid = onlineQueueService.currentUser(queue);
+            if (uid == -1){
+                responseMessage = new ResponseMessage("Queue aren't online!");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+            if (uid == -2){
+                responseMessage = new ResponseMessage("No more users");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+            return ResponseEntity.status(200).body(userService.getUserById(uid));
+        } catch (Exception exc){
+            exc.printStackTrace();
+            responseMessage = new ResponseMessage("No more users in queue or queue not started");
+            return ResponseEntity.status(404).body(responseMessage);
+        }
+    }
+    @PostMapping("/queueUsers/{qid}")
+    public ResponseEntity usersInQueue(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
+        ResponseMessage responseMessage;
+        try {
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
+            Queue queue = queueService.getQueueById(qid);
+            responseMessage = new ResponseMessage("No such queue found");
+            if (queue == null)
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            responseMessage = new ResponseMessage("You are not an owner!");
+            if (queue.getEqOwnerId() != user.getId()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
+            }
+            List<QueueListLive> records = queueListLiveService.getQueueRecordings(queue);
+            records.sort(QueueListLive::compareTo);
+            List<User> usersInQueue = new ArrayList<>();
+            for (QueueListLive r : records) {
+                User quser = userService.getUserById(r.getEqUId());
+                quser.setToken(null);
+                quser.setPassword(null);
+                usersInQueue.add(quser);
+            }
+            return ResponseEntity.status(200).body(usersInQueue);
         } catch (Exception exc){
             exc.printStackTrace();
             responseMessage = new ResponseMessage("No more users in queue or queue not started");

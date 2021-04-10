@@ -24,6 +24,14 @@ public class QueueListLive implements Comparable {
 
     private int eqNumber;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    protected java.util.Date eqEnterTime;
+
+    private float eqServeTimeMin;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    protected java.util.Date eqStartServeTime;
+
     @Override
     public int compareTo(Object o) {
         QueueListLive obj = (QueueListLive)o;
