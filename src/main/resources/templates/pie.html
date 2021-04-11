@@ -1,31 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="https://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8">
-    <title>Круговая диаграмма</title>
-    <script src="https://www.google.com/jsapi"></script>
-    <script>
-        google.load("visualization", "1", {packages:["corechart"]});
-        google.setOnLoadCallback(drawChart);
-        function drawChart() {
-            var data = google.visualization.arrayToDataTable([
-                ['Газ', 'Объём'],
-                ['Азот',     1],
-                ['Кислород', 2],
-                ['Аргон',    3],
-                ['Углекислый газ', 4.5]
-            ]);
-            var options = {
-                title: 'Состав воздуха',
-                is3D: true,
-                pieResidueSliceLabel: 'Остальное'
-            };
-            var chart = new google.visualization.PieChart(document.getElementById('air'));
-            chart.draw(data, options);
-        }
-    </script>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="plotly-latest.min.js"></script>
+    <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
 </head>
 <body>
-<div id="air" style="width: 500px; height: 400px;"></div>
+<div class="wrapper">
+    <div id="plt"></div>
+    <script th:inline="javascript">
+        TESTER = document.getElementById('plt');
+        /*<![CDATA[*/
+        var Title = [[${title}]];
+
+        var X = [[${X}]];
+        var Y = [[${Y}]];
+        /*]]>*/
+        var data = [{
+            values: Y,
+            labels: X,
+            type: 'pie'
+        }];
+
+        var layout = {
+            title: {
+                text:Title,
+                font: {
+                    family: 'Courier New, monospace',
+                    size: 24
+                },
+                xref: 'paper',
+                x: 0.05,
+            },
+            height: 600,
+            width: 600
+        };
+
+
+        Plotly.newPlot("plt", data, layout);
+    </script>
+</div>
+<form action="#" th:action="@{/start}" th:object="${authenticationRequest}" method="post">
+    <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
+    <p><input type="submit" value="Back to query" /></p>
+</form>
 </body>
 </html>

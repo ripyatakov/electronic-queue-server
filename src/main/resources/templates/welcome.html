@@ -33,7 +33,7 @@
 <h1>Query</h1>
 <form action="#" th:action="@{/mquery}" th:object="${managerRequest}" method="post">
     <input type="hidden" th:value="${userList[0].token}" th:attr="name='token'"/>
-    <p>Query: <input type="text" th:field="*{query}" /></p>
+    <p>Query: <input type="text" th:field="*{query}" size="100" /></p>
     <p><input type="submit" value="Send" /> <input type="reset" value="Reset" /></p>
 </form>
 </body>

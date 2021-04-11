@@ -72,7 +72,7 @@ public class QueryManager {
         statObjects.add("count");
         statObjects.add("rate");
         statObjects.add("usersInQueues");
-
+        statObjects.add("propUserTypes");
 
         statParams = new ArrayList<>();
         statParams.add("ownerId");
@@ -210,6 +210,7 @@ public class QueryManager {
                 //queueId
                 int val = Integer.parseInt(value);
                 List<QueueListLive> records = queueListLiveService.getQueueRecordings(val);
+                records.sort(QueueListLive::compareTo);
                 List<Date> X = records.stream().map(a -> a.getEqStartServeTime()).collect(Collectors.toList());
                 List<Float> Y = records.stream()
                         .map(
@@ -302,7 +303,7 @@ public class QueryManager {
             }
         }
         if (obj.equals(statObjects.get(3))){
-            int val = Integer.parseInt(value);
+            //usersInQueues
             List<Queue> allQueues = queueService.getAllQueues();
             List<Integer> Y = allQueues.stream().map(a -> (int)queueListLiveService.queueSize(a)).collect(Collectors.toList());
             List<Integer> X = allQueues.stream().map(a -> a.getId()).collect(Collectors.toList());
@@ -315,6 +316,58 @@ public class QueryManager {
             model.addAttribute("yName", yName);
             model.addAttribute("X", X);
             model.addAttribute("Y", Y);
+        }
+        if (obj.equals(statObjects.get(4))) {
+            //propUserTypes
+            if (param.equals(statParams.get(0))) {
+                //ownerId
+                int val = Integer.parseInt(value);
+                HashMap<String, Integer> hm = new HashMap<>();
+                List<Queue> queues = queueService.getQueuesByOwnerId(val);
+                for (Queue q: queues){
+                    val = q.getId();
+                    List<QueueListLive> queueListLives = queueListLiveService.getQueueRecordings(val);
+                    List<User> users = queueListLives.stream().map(a -> userService.getUserById(a.getEqUId())).collect(Collectors.toList());
+                    for (int i = 0; i < users.size(); i++) {
+                        if (hm.containsKey(users.get(i).getRole())){
+                            hm.put(users.get(i).getRole(), hm.get(users.get(i).getRole()) + 1);
+                        } else
+                            hm.put(users.get(i).getRole(), 1);
+                    }
+                }
+                Set<String> X = hm.keySet();
+                Collection<Integer> Y = hm.values();
+                String title = "Statistic by " + queues.size() + " queues";
+                String xName = "queue id";
+                String yName = "average rating";
+                model.addAttribute("title", title);
+                model.addAttribute("X", X);
+                model.addAttribute("Y", Y);
+                return "pie";
+            } else
+            if (param.equals(statParams.get(1))) {
+                //queueId
+                int val = Integer.parseInt(value);
+                List<QueueListLive> queueListLives = queueListLiveService.getQueueRecordings(val);
+                List<User> users = queueListLives.stream().map(a -> userService.getUserById(a.getEqUId())).collect(Collectors.toList());
+                HashMap<String, Integer> hm = new HashMap<>();
+                for (int i = 0; i < users.size(); i++) {
+                    if (hm.containsKey(users.get(i).getRole())){
+                        hm.put(users.get(i).getRole(), hm.get(users.get(i).getRole()) + 1);
+                    } else
+                        hm.put(users.get(i).getRole(), 1);
+                }
+
+                Set<String> X = hm.keySet();
+                Collection<Integer> Y = hm.values();
+                String title = "Statistic " + val + " queue";
+                String xName = "queue id";
+                String yName = "average rating";
+                model.addAttribute("title", title);
+                model.addAttribute("X", X);
+                model.addAttribute("Y", Y);
+                return "pie";
+            }
         }
         return "graph";
     }
