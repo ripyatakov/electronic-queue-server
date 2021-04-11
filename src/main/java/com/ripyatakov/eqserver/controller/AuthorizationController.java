@@ -2,7 +2,9 @@ package com.ripyatakov.eqserver.controller;
 
 import com.ripyatakov.eqserver.entity.User;
 import com.ripyatakov.eqserver.json.ResponseMessage;
+import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.AuthorizationRequest;
+import com.ripyatakov.eqserver.requests.UpdateUserRequest;
 import com.ripyatakov.eqserver.service.Hasher;
 import com.ripyatakov.eqserver.service.TokenGenerator;
 import com.ripyatakov.eqserver.service.UserService;
@@ -19,14 +21,32 @@ import java.util.HashMap;
 public class AuthorizationController {
     @Autowired
     private UserService userService;
+    private User getUser(AuthenticationRequest authenticationRequest) {
+        return userService.getUserByToken(authenticationRequest.getToken());
+    }
+    @PostMapping("/updateUser")
+    public ResponseEntity updateUser(@RequestBody UpdateUserRequest updateUserRequest, @PathVariable String role){
+        ResponseMessage responseMessage;
+        try {
+            User user = getUser(updateUserRequest);
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
+            if (user == null)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
+            if (updateUserRequest.getPassword() != null){
+                user.setPassword(Hasher.sha256(updateUserRequest.getPassword()));
+            }
+            if (updateUserRequest.getName() != null){
+                user.setName(updateUserRequest.getName());
+            }
+            if (updateUserRequest.getEmail() != null){
+                user.setEmail(updateUserRequest.getEmail());
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userService.saveUser(user));
 
-    @GetMapping("/greeting")
-    public ResponseEntity greeting(){
-        HashMap<Integer, String> hm = new HashMap<>();
-        for (int i = 0; i < 1000; i++) {
-            hm.put(Hasher.getQId(Hasher.getQueueCode(i)), Hasher.getQueueCode(i));
+        } catch (Exception exc){
+            responseMessage = new ResponseMessage("Somebody was authorized by your password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(hm);
     }
     @PostMapping("/register/{role}")
     public ResponseEntity register(@RequestBody AuthorizationRequest registrationRequest, @PathVariable String role){
@@ -80,6 +100,5 @@ public class AuthorizationController {
             responseMessage = new ResponseMessage("No such email found");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
         }
-
     }
 }
