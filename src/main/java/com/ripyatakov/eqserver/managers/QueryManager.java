@@ -50,6 +50,7 @@ public class QueryManager {
         commands.add("get");
         commands.add("search");
         commands.add("stat");
+        commands.add("promote");
 
         objects = new ArrayList<>();
         objects.add("users");
@@ -92,6 +93,9 @@ public class QueryManager {
                 } else
                     if (commands.get(2).equals(queryParts.get(0))){
                         return executeStat(queryParts, model);
+                    } else
+                    if (commands.get(3).equals(queryParts.get(0))){
+                        return executePromote(queryParts, model);
                     }
         } catch (Exception exc) {
             return "errorPage";
@@ -370,6 +374,12 @@ public class QueryManager {
             }
         }
         return "graph";
+    }
+
+    private String executePromote(List<String> params, Model model){
+        String obj = params.get(1);
+        String param = params.get(2);
+        String value = params.get(3);
     }
 
     private List<String> formatString(String query) {

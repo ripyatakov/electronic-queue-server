@@ -184,8 +184,13 @@ public class QueueAdministrationController {
             }
             List<QueueListLive> records = queueListLiveService.getQueueRecordings(queue);
             records.sort(QueueListLive::compareTo);
+            List<QueueListLive> nrecords = new ArrayList<>();
+            for (int i = queue.getEqCurrentUser(); i < records.size(); i++) {
+                nrecords.add(records.get(i));
+            }
+            
             List<User> usersInQueue = new ArrayList<>();
-            for (QueueListLive r : records) {
+            for (QueueListLive r : nrecords) {
                 User quser = userService.getUserById(r.getEqUId());
                 quser.setToken(null);
                 quser.setPassword(null);
