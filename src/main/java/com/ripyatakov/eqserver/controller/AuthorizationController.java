@@ -25,7 +25,7 @@ public class AuthorizationController {
         return userService.getUserByToken(authenticationRequest.getToken());
     }
     @PostMapping("/updateUser")
-    public ResponseEntity updateUser(@RequestBody UpdateUserRequest updateUserRequest, @PathVariable String role){
+    public ResponseEntity updateUser(@RequestBody UpdateUserRequest updateUserRequest){
         ResponseMessage responseMessage;
         try {
             User user = getUser(updateUserRequest);
