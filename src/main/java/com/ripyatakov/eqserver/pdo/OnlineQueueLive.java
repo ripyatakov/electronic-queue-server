@@ -216,13 +216,13 @@ public class OnlineQueueLive implements OnlineQueue {
         }
     }
 
-    public synchronized void registerWithoutQueue(User user){
+    public synchronized QueueListLive registerWithoutQueue(User user){
         int cur = queueInfo.getEqCurrentUser();
         synchronized (queue) {
             updated = true;
             if (queue.size() <= cur) {
                 registerForQueue(user);
-                return;
+                return queue.get(cur);
             }
             for (int i = cur; i < queue.size(); i++) {
                 queue.get(i).setEqNumber(queue.get(i).getEqNumber() + 1);
@@ -230,6 +230,7 @@ public class OnlineQueueLive implements OnlineQueue {
             QueueListLive newRecord = new QueueListLive(queueInfo.getId(), user.getId(), queue.get(cur).getEqNumber() - 1,
                     new Date(), 0, new Date());
             queue.add(cur, newRecord);
+            return newRecord;
         }
     }
 

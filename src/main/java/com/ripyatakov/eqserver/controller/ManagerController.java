@@ -128,6 +128,25 @@ public class ManagerController {
         }
         return "errorPage";
     }
+    @PostMapping("/makeAnAdmin/{uid}")
+    public String makeAnAdmin(@ModelAttribute AuthenticationRequest authenticationRequest, @PathVariable int uid, Model model){
+        try {
+            model.addAttribute("authenticationRequest", authenticationRequest);
+            User user = userService.getUserByToken(authenticationRequest.getToken());
+            if (!user.getRole().equals("manager")) {
+                return "errorPage";
+            }
+            User userToAdmin = userService.getUserById(uid);
+            if (userToAdmin.getRole().equals("user")){
+                userToAdmin.setRole("admin");
+            }
+            userService.saveUser(userToAdmin);
+            return query(new ManagerRequest(authenticationRequest.getToken(), ("search users id " + userToAdmin.getId())), model);
+        } catch (Exception exc){
+            exc.printStackTrace();
+        }
+        return "errorPage";
+    }
 
     @PostMapping("/queueReview/{qid}")
     public String queueReview(@ModelAttribute AuthenticationRequest authenticationRequest, @PathVariable int qid, Model model){

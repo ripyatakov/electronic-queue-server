@@ -45,7 +45,7 @@ public class AuthorizationController {
 
         } catch (Exception exc){
             responseMessage = new ResponseMessage("Somebody was authorized by your password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
         }
     }
     @PostMapping("/register/{role}")

@@ -17,6 +17,10 @@ public class QueueListLiveService {
     @Autowired
     QueueListLiveRepository repository;
 
+    public QueueListLive save(QueueListLive queueListLive){
+        return repository.save(queueListLive);
+    }
+
     public int deleteAll(List<QueueListLive> queues){
         repository.deleteAll(queues);
         return queues.size();

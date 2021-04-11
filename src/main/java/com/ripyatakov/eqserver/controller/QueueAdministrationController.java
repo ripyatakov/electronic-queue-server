@@ -216,8 +216,9 @@ public class QueueAdministrationController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             User anon = userService.registerAnonym();
-            boolean res = onlineQueueService.registerWithoutQueue(queue, anon);
-            if (res){
+            QueueListLive res = onlineQueueService.registerWithoutQueue(queue, anon);
+            if (res != null){
+                queueListLiveService.save(res);
                 return ResponseEntity.status(HttpStatus.OK).body(anon);
             } else{
                 responseMessage = new ResponseMessage("Cant create anon");
