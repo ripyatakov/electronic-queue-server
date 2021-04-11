@@ -188,7 +188,7 @@ public class QueueAdministrationController {
             for (int i = queue.getEqCurrentUser(); i < records.size(); i++) {
                 nrecords.add(records.get(i));
             }
-            
+
             List<User> usersInQueue = new ArrayList<>();
             for (QueueListLive r : nrecords) {
                 User quser = userService.getUserById(r.getEqUId());

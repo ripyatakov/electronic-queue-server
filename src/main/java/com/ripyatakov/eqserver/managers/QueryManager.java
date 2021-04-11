@@ -3,6 +3,7 @@ package com.ripyatakov.eqserver.managers;
 import com.ripyatakov.eqserver.entity.Queue;
 import com.ripyatakov.eqserver.entity.QueueListLive;
 import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.requests.ManagerRequest;
 import com.ripyatakov.eqserver.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,7 +153,7 @@ public class QueryManager {
                 userList.addAll(userService.findAllByRole(value));
             }
             model.addAttribute("userList", userList);
-            return "userList";
+            return "newUserList";
         } else if (obj.equals(objects.get(1))){
             //queues
             List<Queue> queueList = new ArrayList<>();
@@ -173,7 +174,7 @@ public class QueryManager {
                 queueList.addAll(queueService.findAllByEqStatusLike(value));
             }
             model.addAttribute("queueList", queueList);
-            return "queueList";
+            return "newQueueList";
         }
         return null;
     }
@@ -377,9 +378,14 @@ public class QueryManager {
     }
 
     private String executePromote(List<String> params, Model model){
-        String obj = params.get(1);
-        String param = params.get(2);
-        String value = params.get(3);
+        String param = params.get(1);
+        int uid = Integer.parseInt(param);
+        User userToAdmin = userService.getUserById(uid);
+        if (userToAdmin.getRole().equals("user")){
+            userToAdmin.setRole("admin");
+        }
+        userService.saveUser(userToAdmin);
+        return executeQuery("search users id " + userToAdmin.getId(), model);
     }
 
     private List<String> formatString(String query) {
