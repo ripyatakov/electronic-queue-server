@@ -244,7 +244,9 @@ public class OnlineQueueLive implements OnlineQueue {
     }
 
     public synchronized List<QueueListLive> dataToSave(){
-        return queue;
+        synchronized (queue) {
+            return queue;
+        }
     }
     public synchronized List<QueueListLive> dataToDelete() {
         return toDelete;

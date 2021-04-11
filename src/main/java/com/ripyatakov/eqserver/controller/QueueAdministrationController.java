@@ -189,7 +189,11 @@ public class QueueAdministrationController {
             if (queue.getEqOwnerId() != user.getId()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
-            List<QueueListLive> records = queueListLiveService.getQueueRecordings(queue);
+            List<QueueListLive> records;
+            if (onlineQueueService.isOnline(queue)){
+                records = onlineQueueService.activeUsers(queue);
+            } else
+                records = queueListLiveService.getQueueRecordings(queue);
             records.sort(QueueListLive::compareTo);
             List<QueueListLive> nrecords = new ArrayList<>();
             for (int i = queue.getEqCurrentUser(); i < records.size(); i++) {

@@ -130,4 +130,9 @@ public class OnlineQueueService {
             return null;
         return onlineQueues.get(queue.getId()).registerWithoutQueue(user);
     }
+    public synchronized  List<QueueListLive> activeUsers(Queue queue){
+        if (isOnline(queue))
+            return onlineQueues.get(queue.getId()).dataToSave();
+        return null;
+    }
 }
