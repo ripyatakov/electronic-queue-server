@@ -44,7 +44,6 @@ public class QueryManager {
     private List<String> statObjects;
 
 
-
     @PostConstruct
     private void init() {
         commands = new ArrayList<>();
@@ -52,6 +51,7 @@ public class QueryManager {
         commands.add("search");
         commands.add("stat");
         commands.add("promote");
+        commands.add("demote");
 
         objects = new ArrayList<>();
         objects.add("users");
@@ -88,16 +88,15 @@ public class QueryManager {
             List<String> queryParts = formatString(query);
             if (commands.get(0).equals(queryParts.get(0))) {
                 return executeGet(queryParts, model);
-            } else
-                if (commands.get(1).equals(queryParts.get(0))){
-                    return executeSearch(queryParts, model);
-                } else
-                    if (commands.get(2).equals(queryParts.get(0))){
-                        return executeStat(queryParts, model);
-                    } else
-                    if (commands.get(3).equals(queryParts.get(0))){
-                        return executePromote(queryParts, model);
-                    }
+            } else if (commands.get(1).equals(queryParts.get(0))) {
+                return executeSearch(queryParts, model);
+            } else if (commands.get(2).equals(queryParts.get(0))) {
+                return executeStat(queryParts, model);
+            } else if (commands.get(3).equals(queryParts.get(0))) {
+                return executePromote(queryParts, model);
+            } else if (commands.get(4).equals(queryParts.get(0))) {
+                return executeDemote(queryParts, model);
+            }
         } catch (Exception exc) {
             return "errorPage";
         }
@@ -119,7 +118,7 @@ public class QueryManager {
             List<User> userList = userService.findAllByPage(pageNumber, pageSize);
             model.addAttribute("userList", userList);
             return "newUserList";
-        } else if (obj.equals(objects.get(1))){
+        } else if (obj.equals(objects.get(1))) {
             if (params.size() >= 4) {
                 pageNumber = Integer.parseInt(params.get(2));
                 pageSize = Integer.parseInt(params.get(3));
@@ -133,43 +132,43 @@ public class QueryManager {
         return "errorPage";
     }
 
-    private String executeSearch(List<String> params, Model model){
+    private String executeSearch(List<String> params, Model model) {
         if (!objects.contains(params.get(1)))
             throw new IllegalArgumentException();
         String obj = params.get(1);
         String param = params.get(2);
         String value = params.get(3);
-        if (obj.equals(objects.get(0))){
+        if (obj.equals(objects.get(0))) {
             List<User> userList = new ArrayList<>();
             //users
-            if (param.equals(userParams.get(0))){
+            if (param.equals(userParams.get(0))) {
                 //id
                 userList.addAll(userService.findAllById(Integer.parseInt(value)));
-            } else if (param.equals(userParams.get(1))){
+            } else if (param.equals(userParams.get(1))) {
                 //name
                 userList.addAll(userService.findAllByName(value));
-            } else if (param.equals(userParams.get(2))){
+            } else if (param.equals(userParams.get(2))) {
                 //role
                 userList.addAll(userService.findAllByRole(value));
             }
             model.addAttribute("userList", userList);
             return "newUserList";
-        } else if (obj.equals(objects.get(1))){
+        } else if (obj.equals(objects.get(1))) {
             //queues
             List<Queue> queueList = new ArrayList<>();
-            if (param.equals(queueParams.get(0))){
+            if (param.equals(queueParams.get(0))) {
                 //id
                 queueList.addAll(queueService.findAllById(Integer.parseInt(value)));
-            } else if (param.equals(queueParams.get(1))){
+            } else if (param.equals(queueParams.get(1))) {
                 //title
                 queueList.addAll(queueService.findAllByEqTitle(value));
-            } else if (param.equals(queueParams.get(2))){
+            } else if (param.equals(queueParams.get(2))) {
                 //ownerId
                 queueList.addAll(queueService.getQueuesByOwnerId(Integer.parseInt(value)));
-            } else if (param.equals(queueParams.get(3))){
+            } else if (param.equals(queueParams.get(3))) {
                 //type
                 queueList.addAll(queueService.findAllByEqTypeLike(value));
-            } else if (param.equals(queueParams.get(4))){
+            } else if (param.equals(queueParams.get(4))) {
                 //status
                 queueList.addAll(queueService.findAllByEqStatusLike(value));
             }
@@ -179,7 +178,7 @@ public class QueryManager {
         return null;
     }
 
-    private String executeStat(List<String> params, Model model){
+    private String executeStat(List<String> params, Model model) {
         params.add("ownerId");
         params.add("23");
         String obj = params.get(1);
@@ -187,9 +186,9 @@ public class QueryManager {
         String value = params.get(3);
         if (!statObjects.contains(obj) || !statParams.contains(param))
             throw new IllegalArgumentException();
-        if (obj.equals(statObjects.get(0))){
+        if (obj.equals(statObjects.get(0))) {
             //averageWaitingTime
-            if (param.equals(statParams.get(0))){
+            if (param.equals(statParams.get(0))) {
                 //ownerId
                 int val = Integer.parseInt(value);
                 List<Queue> queues = queueService.getQueuesByOwnerId(val);
@@ -211,7 +210,7 @@ public class QueryManager {
                 model.addAttribute("X", X);
                 model.addAttribute("Y", Y);
             }
-            if (param.equals(statParams.get(1))){
+            if (param.equals(statParams.get(1))) {
                 //queueId
                 int val = Integer.parseInt(value);
                 List<QueueListLive> records = queueListLiveService.getQueueRecordings(val);
@@ -219,9 +218,9 @@ public class QueryManager {
                 List<Date> X = records.stream().map(a -> a.getEqStartServeTime()).collect(Collectors.toList());
                 List<Float> Y = records.stream()
                         .map(
-                        a -> (float)((a.getEqStartServeTime().getTime() - a.getEqEnterTime().getTime())/1000.0/60.0) - a.getEqServeTimeMin()
-                )
-                        .map(a -> (a< 0)?0:a )
+                                a -> (float) ((a.getEqStartServeTime().getTime() - a.getEqEnterTime().getTime()) / 1000.0 / 60.0) - a.getEqServeTimeMin()
+                        )
+                        .map(a -> (a < 0) ? 0 : a)
                         .collect(Collectors.toList());
                 String title = "Waiting time";
                 String xName = "time start user serving";
@@ -234,9 +233,9 @@ public class QueryManager {
                 model.addAttribute("Y", Y);
             }
         }
-        if (obj.equals(statObjects.get(1))){
+        if (obj.equals(statObjects.get(1))) {
             //count
-            if (param.equals(statParams.get(0))){
+            if (param.equals(statParams.get(0))) {
                 //ownerId
                 int val = Integer.parseInt(value);
                 List<Queue> queues = queueService.getQueuesByOwnerId(val);
@@ -248,7 +247,7 @@ public class QueryManager {
                 });
                 //queueListLiveService.queueSize();
                 List<Integer> X = queues.stream().map(a -> a.getId()).collect(Collectors.toList());
-                List<Integer> Y = queues.stream().map(a -> (int)queueListLiveService.queueSize(a)).collect(Collectors.toList());
+                List<Integer> Y = queues.stream().map(a -> (int) queueListLiveService.queueSize(a)).collect(Collectors.toList());
                 String title = "Statistic by owner id";
                 String xName = "queue id";
                 String yName = "amount registered users";
@@ -259,13 +258,13 @@ public class QueryManager {
                 model.addAttribute("X", X);
                 model.addAttribute("Y", Y);
             }
-            if (param.equals(statParams.get(1))){
+            if (param.equals(statParams.get(1))) {
                 //queueId
                 int val = Integer.parseInt(value);
                 List<String> X = new ArrayList<>();
                 for (int i = 0; i < 24; i++) {
-                    if (new Integer(i).toString().length() < 2){
-                        X.add("0" + i+ ":00");
+                    if (new Integer(i).toString().length() < 2) {
+                        X.add("0" + i + ":00");
                     } else
                         X.add(i + ":00");
                 }
@@ -283,7 +282,7 @@ public class QueryManager {
         }
         if (obj.equals(statObjects.get(2))) {
             //rate
-            if (param.equals(statParams.get(0))){
+            if (param.equals(statParams.get(0))) {
                 //ownerId
                 int val = Integer.parseInt(value);
                 List<Queue> queues = queueService.getQueuesByOwnerId(val);
@@ -295,7 +294,7 @@ public class QueryManager {
                 });
 
                 List<Integer> X = queues.stream().map(a -> a.getId()).collect(Collectors.toList());
-                List<Double> Y = queues.stream().map(a ->  reviewService.getAverageRating(a)).collect(Collectors.toList());
+                List<Double> Y = queues.stream().map(a -> reviewService.getAverageRating(a)).collect(Collectors.toList());
                 String title = "Statistic average rating by queues";
                 String xName = "queue id";
                 String yName = "average rating";
@@ -307,10 +306,10 @@ public class QueryManager {
                 model.addAttribute("Y", Y);
             }
         }
-        if (obj.equals(statObjects.get(3))){
+        if (obj.equals(statObjects.get(3))) {
             //usersInQueues
             List<Queue> allQueues = queueService.getAllQueues();
-            List<Integer> Y = allQueues.stream().map(a -> (int)queueListLiveService.queueSize(a)).collect(Collectors.toList());
+            List<Integer> Y = allQueues.stream().map(a -> (int) queueListLiveService.queueSize(a)).collect(Collectors.toList());
             List<Integer> X = allQueues.stream().map(a -> a.getId()).collect(Collectors.toList());
             String title = "Registered users statistic";
             String xName = "queue id";
@@ -329,12 +328,12 @@ public class QueryManager {
                 int val = Integer.parseInt(value);
                 HashMap<String, Integer> hm = new HashMap<>();
                 List<Queue> queues = queueService.getQueuesByOwnerId(val);
-                for (Queue q: queues){
+                for (Queue q : queues) {
                     val = q.getId();
                     List<QueueListLive> queueListLives = queueListLiveService.getQueueRecordings(val);
                     List<User> users = queueListLives.stream().map(a -> userService.getUserById(a.getEqUId())).collect(Collectors.toList());
                     for (int i = 0; i < users.size(); i++) {
-                        if (hm.containsKey(users.get(i).getRole())){
+                        if (hm.containsKey(users.get(i).getRole())) {
                             hm.put(users.get(i).getRole(), hm.get(users.get(i).getRole()) + 1);
                         } else
                             hm.put(users.get(i).getRole(), 1);
@@ -349,15 +348,14 @@ public class QueryManager {
                 model.addAttribute("X", X);
                 model.addAttribute("Y", Y);
                 return "pie";
-            } else
-            if (param.equals(statParams.get(1))) {
+            } else if (param.equals(statParams.get(1))) {
                 //queueId
                 int val = Integer.parseInt(value);
                 List<QueueListLive> queueListLives = queueListLiveService.getQueueRecordings(val);
                 List<User> users = queueListLives.stream().map(a -> userService.getUserById(a.getEqUId())).collect(Collectors.toList());
                 HashMap<String, Integer> hm = new HashMap<>();
                 for (int i = 0; i < users.size(); i++) {
-                    if (hm.containsKey(users.get(i).getRole())){
+                    if (hm.containsKey(users.get(i).getRole())) {
                         hm.put(users.get(i).getRole(), hm.get(users.get(i).getRole()) + 1);
                     } else
                         hm.put(users.get(i).getRole(), 1);
@@ -377,12 +375,23 @@ public class QueryManager {
         return "graph";
     }
 
-    private String executePromote(List<String> params, Model model){
+    private String executePromote(List<String> params, Model model) {
         String param = params.get(1);
         int uid = Integer.parseInt(param);
         User userToAdmin = userService.getUserById(uid);
-        if (userToAdmin.getRole().equals("user")){
+        if (userToAdmin.getRole().equals("user")) {
             userToAdmin.setRole("admin");
+        }
+        userService.saveUser(userToAdmin);
+        return executeQuery("search users id " + userToAdmin.getId(), model);
+    }
+
+    private String executeDemote(List<String> params, Model model) {
+        String param = params.get(1);
+        int uid = Integer.parseInt(param);
+        User userToAdmin = userService.getUserById(uid);
+        if (userToAdmin.getRole().equals("admin")) {
+            userToAdmin.setRole("user");
         }
         userService.saveUser(userToAdmin);
         return executeQuery("search users id " + userToAdmin.getId(), model);
