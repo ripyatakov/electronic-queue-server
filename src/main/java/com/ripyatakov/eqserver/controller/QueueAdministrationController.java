@@ -33,29 +33,29 @@ public class QueueAdministrationController {
     @Autowired
     private OnlineQueueService onlineQueueService;
 
-    private List<QueueData> getQueueDatas(List<Queue> queues){
+    private List<QueueData> getQueueDatas(List<Queue> queues) {
         return
                 queues.stream()
-                .map(a -> new QueueData(a,(int)queueListLiveService.queueSize(a), Hasher.getQueueCode(a.getId()) ))
-                .collect(Collectors.toList());
+                        .map(a -> new QueueData(a, (int) queueListLiveService.queueSize(a), Hasher.getQueueCode(a.getId())))
+                        .collect(Collectors.toList());
     }
 
-    private QueueData getQueueData(Queue queue){
-        return new QueueData(queue, (int)queueListLiveService.queueSize(queue), Hasher.getQueueCode(queue.getId()));
+    private QueueData getQueueData(Queue queue) {
+        return new QueueData(queue, (int) queueListLiveService.queueSize(queue), Hasher.getQueueCode(queue.getId()));
     }
 
-    private boolean queueToOnline(Queue queue){
-        return ((queue.getEqDateStart().getTime()/1000/60/60/24 == (new Date()).getTime()/1000/60/60/24) ||
-        (queue.getEqDateStart().before(new Date()) && queue.getEqDateEnd().after(new Date())));
+    private boolean queueToOnline(Queue queue) {
+        return ((queue.getEqDateStart().getTime() / 1000 / 60 / 60 / 24 == (new Date()).getTime() / 1000 / 60 / 60 / 24) ||
+                (queue.getEqDateStart().before(new Date()) && queue.getEqDateEnd().after(new Date())));
     }
 
     @GetMapping("/allQueues")
-    public List<Queue> allQueues(){
+    public List<Queue> allQueues() {
         return queueService.getAllQueues();
     }
 
     @PostMapping("/createQueue/{type}")
-    public ResponseEntity createQueue(@RequestBody CreateQueueRequest createQueueRequest, @PathVariable String type){
+    public ResponseEntity createQueue(@RequestBody CreateQueueRequest createQueueRequest, @PathVariable String type) {
         ResponseMessage responseMessage;
         try {
             User owner = userService.getUserByToken(createQueueRequest.getToken());
@@ -70,25 +70,27 @@ public class QueueAdministrationController {
                     createQueueRequest.getTitle(),
                     createQueueRequest.getDescription(),
                     "inactive"
-                    );
+            );
             queue = queueService.saveQueue(queue);
-            if (queueToOnline(queue)){
+            if (queueToOnline(queue)) {
                 onlineQueueService.loadOnlineLiveQueue(queue, new ArrayList<>());
                 System.out.println("Queue online registered");
             }
             return ResponseEntity.status(HttpStatus.OK).body(new QueueData(queue, 0, Hasher.getQueueCode(queue.getId())));
-        } catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
             responseMessage = new ResponseMessage("Can't create queue");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(responseMessage);
         }
 
     }
+
     @PostMapping("/createQueue")
-    public ResponseEntity createQueue(@RequestBody CreateQueueRequest createQueueRequest){
+    public ResponseEntity createQueue(@RequestBody CreateQueueRequest createQueueRequest) {
         return this.createQueue(createQueueRequest, "live");
 
     }
+
     @PostMapping("/next/{qid}")
     public ResponseEntity next(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
         ResponseMessage responseMessage;
@@ -102,17 +104,20 @@ public class QueueAdministrationController {
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             responseMessage = new ResponseMessage("You are not an owner!");
-            if (queue.getEqOwnerId() != user.getId()){
+            if (queue.getEqOwnerId() != user.getId()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             int uid = onlineQueueService.nextUser(queue);
             responseMessage = new ResponseMessage("No more users in queue or queue not started");
-            if (uid == -1){
+            if (uid == -1) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
-            } else{
+            } else if (uid == -2) {
+                responseMessage = new ResponseMessage("No more users in queue");
+                return ResponseEntity.status(HttpStatus.OK).body(responseMessage);
+            } else {
                 return ResponseEntity.status(200).body(userService.getUserById(uid));
             }
-        } catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
             responseMessage = new ResponseMessage("No more users in queue or queue not started");
             return ResponseEntity.status(404).body(responseMessage);
@@ -128,12 +133,13 @@ public class QueueAdministrationController {
             if (user == null)
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseMessage);
             return ResponseEntity.status(200).body(getQueueDatas(queueService.getQueuesByOwnerId(user.getId())));
-        } catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
             responseMessage = new ResponseMessage("No more users in queue or queue not started");
             return ResponseEntity.status(404).body(responseMessage);
         }
     }
+
     @PostMapping("/currentUser/{qid}")
     public ResponseEntity currentUser(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
         ResponseMessage responseMessage;
@@ -147,25 +153,26 @@ public class QueueAdministrationController {
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             responseMessage = new ResponseMessage("You are not an owner!");
-            if (queue.getEqOwnerId() != user.getId()){
+            if (queue.getEqOwnerId() != user.getId()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             int uid = onlineQueueService.currentUser(queue);
-            if (uid == -1){
+            if (uid == -1) {
                 responseMessage = new ResponseMessage("Queue aren't online!");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
-            if (uid == -2){
+            if (uid == -2) {
                 responseMessage = new ResponseMessage("No more users");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             return ResponseEntity.status(200).body(userService.getUserById(uid));
-        } catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
             responseMessage = new ResponseMessage("No more users in queue or queue not started");
             return ResponseEntity.status(404).body(responseMessage);
         }
     }
+
     @PostMapping("/queueUsers/{qid}")
     public ResponseEntity usersInQueue(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
         ResponseMessage responseMessage;
@@ -179,7 +186,7 @@ public class QueueAdministrationController {
             if (queue == null)
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             responseMessage = new ResponseMessage("You are not an owner!");
-            if (queue.getEqOwnerId() != user.getId()){
+            if (queue.getEqOwnerId() != user.getId()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             List<QueueListLive> records = queueListLiveService.getQueueRecordings(queue);
@@ -197,12 +204,13 @@ public class QueueAdministrationController {
                 usersInQueue.add(quser);
             }
             return ResponseEntity.status(200).body(usersInQueue);
-        } catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
             responseMessage = new ResponseMessage("No more users in queue or queue not started");
             return ResponseEntity.status(404).body(responseMessage);
         }
     }
+
     @PostMapping("/registerWithoutQueue/{qid}")
     public ResponseEntity registerWithoutQueue(@RequestBody AuthenticationRequest authenticationRequest, @PathVariable int qid) {
         ResponseMessage responseMessage;
@@ -217,19 +225,19 @@ public class QueueAdministrationController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
 
             responseMessage = new ResponseMessage("Action not allowed for you");
-            if (!user.getRole().equals("manager") && !user.getRole().equals("admin")){
+            if (!user.getRole().equals("manager") && !user.getRole().equals("admin")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             User anon = userService.registerAnonym();
             QueueListLive res = onlineQueueService.registerWithoutQueue(queue, anon);
-            if (res != null){
+            if (res != null) {
                 queueListLiveService.save(res);
                 return ResponseEntity.status(HttpStatus.OK).body(anon);
-            } else{
+            } else {
                 responseMessage = new ResponseMessage("Cant create anon");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
-        } catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
             responseMessage = new ResponseMessage("No more users in queue or queue not started");
             return ResponseEntity.status(404).body(responseMessage);
@@ -250,18 +258,18 @@ public class QueueAdministrationController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
 
             responseMessage = new ResponseMessage("Action not allowed for you");
-            if (!user.getRole().equals("manager") && !user.getRole().equals("admin")){
+            if (!user.getRole().equals("manager") && !user.getRole().equals("admin")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
             User anon = userService.registerAnonym();
             QueueData res = onlineQueueService.registerForQueue(queue, anon);
-            if (res != null ){
+            if (res != null) {
                 return ResponseEntity.status(HttpStatus.OK).body(res);
-            } else{
+            } else {
                 responseMessage = new ResponseMessage("Cant create anon");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseMessage);
             }
-        } catch (Exception exc){
+        } catch (Exception exc) {
             exc.printStackTrace();
             responseMessage = new ResponseMessage("No more users in queue or queue not started");
             return ResponseEntity.status(404).body(responseMessage);
