@@ -41,7 +41,7 @@ public class AuthorizationController {
             if (updateUserRequest.getEmail() != null){
                 user.setEmail(updateUserRequest.getEmail());
             }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(userService.saveUser(user));
+            return ResponseEntity.status(HttpStatus.OK).body(userService.saveUser(user));
 
         } catch (Exception exc){
             responseMessage = new ResponseMessage("Somebody was authorized by your password");
