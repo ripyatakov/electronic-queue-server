@@ -3,6 +3,8 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <script src="plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
 </head>
 <body>
@@ -66,7 +68,7 @@
 </div>
 <form action="#" th:action="@{/start}" th:object="${authenticationRequest}" method="post">
     <input type="hidden" th:value="${authenticationRequest.token}" th:attr="name='token'"/>
-    <p><input type="submit" value="Back to query" /></p>
+    <button class="w-10 py-1 m-2 btn btn-lg btn-primary" type="submit" style = "background: cadetblue">Go to query</button>
 </form>
 </body>
 </html>

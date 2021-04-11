@@ -113,7 +113,7 @@ public class QueryManager {
             }
             List<User> userList = userService.findAllByPage(pageNumber, pageSize);
             model.addAttribute("userList", userList);
-            return "userList";
+            return "newUserList";
         } else if (obj.equals(objects.get(1))){
             if (params.size() >= 4) {
                 pageNumber = Integer.parseInt(params.get(2));
@@ -123,7 +123,7 @@ public class QueryManager {
             }
             List<Queue> queueList = queueService.findAllByPage(pageNumber, pageSize);
             model.addAttribute("queueList", queueList);
-            return "queueList";
+            return "newQueueList";
         }
         return "errorPage";
     }

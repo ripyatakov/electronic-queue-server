@@ -86,7 +86,7 @@ public class QueueListLiveService {
     public List<Integer> usersRegistersByHours(int qid){
         List<Integer> lst = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+        calendar.setTime(repository.findByEqQId(qid).get(0).getEqEnterTime());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);

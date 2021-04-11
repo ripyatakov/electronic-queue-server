@@ -67,7 +67,8 @@ public class ManagerController {
         userList.add(user);
         model.addAttribute("userList", userList);
         model.addAttribute("managerRequest", new ManagerRequest());
-        return "welcome";
+        //return "welcome";
+        return "newWelcome";
     }
     @PostMapping("/mquery")
     public String query(@ModelAttribute ManagerRequest managerRequest, Model model) {
@@ -94,7 +95,7 @@ public class ManagerController {
             userList.add(user);
             model.addAttribute("userList", userList);
             model.addAttribute("managerRequest", new ManagerRequest());
-            return "welcome";
+            return "newWelcome";
         } catch (Exception exc){
             exc.printStackTrace();
         }
@@ -120,7 +121,7 @@ public class ManagerController {
             model.addAttribute("queue", queue);
             model.addAttribute("queueRate", String.format("%.2f", reviewService.getAverageRating(queue)));
             model.addAttribute("usersInQueue", usersInQueue);
-            return "usersInQueue";
+            return "newUsersInQueue";
         } catch (Exception exc){
             exc.printStackTrace();
 
@@ -142,7 +143,7 @@ public class ManagerController {
             model.addAttribute("queue", queue);
             model.addAttribute("queueRate", String.format("%.2f", reviewService.getAverageRating(queue)));
             model.addAttribute("queueReviews", toReviewHtml(reviewService.findAllByQid(qid)));
-            return "queueReview";
+            return "newQueueReview";
         } catch (Exception exc){
             exc.printStackTrace();
 
@@ -162,7 +163,7 @@ public class ManagerController {
 
             model.addAttribute("user", user1);
             model.addAttribute("userReviews", toReviewHtml(reviewService.findAllByUid(uid)));
-            return "userReview";
+            return "newUserReview";
         } catch (Exception exc){
             exc.printStackTrace();
 
