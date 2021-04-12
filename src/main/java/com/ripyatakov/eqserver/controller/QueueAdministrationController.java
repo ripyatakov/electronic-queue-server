@@ -45,7 +45,8 @@ public class QueueAdministrationController {
     }
 
     private boolean queueToOnline(Queue queue) {
-        return ((queue.getEqDateStart().getTime() / 1000 / 60 / 60 / 24 == (new Date()).getTime() / 1000 / 60 / 60 / 24) ||
+        return (
+                Math.abs(queue.getEqDateStart().getTime() / 1000 / 60 / 60 / 24 - (new Date()).getTime() / 1000 / 60 / 60 / 24) <= 1||
                 (queue.getEqDateStart().before(new Date()) && queue.getEqDateEnd().after(new Date())));
     }
 

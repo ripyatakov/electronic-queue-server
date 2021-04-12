@@ -42,6 +42,7 @@ public class OnlineQueuesManager {
             }
         }
     }
+
     @Scheduled(fixedDelayString = "${queueUpdateDelay}", initialDelayString = "${queueInitialDelay}"  )
     private synchronized void updateQueues(){
         System.out.println("Update beginning");
@@ -57,5 +58,12 @@ public class OnlineQueuesManager {
             }
             queueService.saveQueues(queues);
         }
+    }
+    @Scheduled(cron = "0/42 0 00 * * *")
+    private synchronized void reloadingQueues(){
+        System.out.println("Start queue reloading");
+        updateQueues();
+        initializeOnlineQueues();
+        System.out.println("Reloading successfully");
     }
 }
