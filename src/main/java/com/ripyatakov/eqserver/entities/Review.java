@@ -1,6 +1,5 @@
-package com.ripyatakov.eqserver.entity;
+package com.ripyatakov.eqserver.entities;
 
-import com.ripyatakov.eqserver.id_classes.QueueListLiveId;
 import com.ripyatakov.eqserver.id_classes.ReviewId;
 import lombok.AllArgsConstructor;
 import lombok.Data;

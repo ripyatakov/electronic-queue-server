@@ -1,11 +1,8 @@
 package com.ripyatakov.eqserver.html;
 
-import com.ripyatakov.eqserver.service.ReviewService;
-import com.ripyatakov.eqserver.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Data
 @AllArgsConstructor

@@ -1,6 +1,6 @@
 package com.ripyatakov.eqserver.json;
 
-import com.ripyatakov.eqserver.entity.Queue;
+import com.ripyatakov.eqserver.entities.Queue;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

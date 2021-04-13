@@ -1,8 +1,6 @@
 package com.ripyatakov.eqserver.repository;
 
-import com.ripyatakov.eqserver.entity.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.ripyatakov.eqserver.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

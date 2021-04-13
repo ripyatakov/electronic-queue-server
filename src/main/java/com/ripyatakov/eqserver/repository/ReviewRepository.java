@@ -1,7 +1,6 @@
 package com.ripyatakov.eqserver.repository;
 
-import com.ripyatakov.eqserver.entity.Review;
-import com.ripyatakov.eqserver.id_classes.QueueListLiveId;
+import com.ripyatakov.eqserver.entities.Review;
 import com.ripyatakov.eqserver.id_classes.ReviewId;
 import org.springframework.data.jpa.repository.JpaRepository;
 

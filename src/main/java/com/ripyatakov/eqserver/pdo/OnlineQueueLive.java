@@ -1,10 +1,10 @@
 package com.ripyatakov.eqserver.pdo;
 
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.QueueListLive;
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.Queue;
+import com.ripyatakov.eqserver.entities.QueueListLive;
+import com.ripyatakov.eqserver.entities.User;
 import com.ripyatakov.eqserver.json.QueueData;
-import com.ripyatakov.eqserver.service.Hasher;
+import com.ripyatakov.eqserver.services.Hasher;
 
 import java.util.*;
 
@@ -279,6 +279,4 @@ public class OnlineQueueLive implements OnlineQueue {
             }
         }
     }
-
-
 }

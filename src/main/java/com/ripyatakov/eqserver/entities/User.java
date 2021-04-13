@@ -1,4 +1,4 @@
-package com.ripyatakov.eqserver.entity;
+package com.ripyatakov.eqserver.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

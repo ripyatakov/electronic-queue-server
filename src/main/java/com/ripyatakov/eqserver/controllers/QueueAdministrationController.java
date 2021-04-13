@@ -1,21 +1,18 @@
-package com.ripyatakov.eqserver.controller;
+package com.ripyatakov.eqserver.controllers;
 
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.QueueListLive;
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.Queue;
+import com.ripyatakov.eqserver.entities.QueueListLive;
+import com.ripyatakov.eqserver.entities.User;
 import com.ripyatakov.eqserver.json.QueueData;
 import com.ripyatakov.eqserver.json.ResponseMessage;
-import com.ripyatakov.eqserver.json.UserInQueue;
-import com.ripyatakov.eqserver.managers.OnlineQueuesManager;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.CreateQueueRequest;
-import com.ripyatakov.eqserver.service.*;
+import com.ripyatakov.eqserver.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

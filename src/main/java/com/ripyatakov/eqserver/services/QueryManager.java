@@ -1,14 +1,12 @@
-package com.ripyatakov.eqserver.managers;
+package com.ripyatakov.eqserver.services;
 
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.QueueListLive;
-import com.ripyatakov.eqserver.entity.User;
-import com.ripyatakov.eqserver.requests.ManagerRequest;
-import com.ripyatakov.eqserver.service.*;
+import com.ripyatakov.eqserver.entities.Queue;
+import com.ripyatakov.eqserver.entities.QueueListLive;
+import com.ripyatakov.eqserver.entities.User;
+import com.ripyatakov.eqserver.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 

@@ -1,20 +1,18 @@
-package com.ripyatakov.eqserver.controller;
+package com.ripyatakov.eqserver.controllers;
 
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.User;
 import com.ripyatakov.eqserver.json.ResponseMessage;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.AuthorizationRequest;
 import com.ripyatakov.eqserver.requests.UpdateUserRequest;
-import com.ripyatakov.eqserver.service.Hasher;
-import com.ripyatakov.eqserver.service.TokenGenerator;
-import com.ripyatakov.eqserver.service.UserService;
+import com.ripyatakov.eqserver.services.Hasher;
+import com.ripyatakov.eqserver.services.TokenGenerator;
+import com.ripyatakov.eqserver.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
 
 @RestController
 @RequiredArgsConstructor

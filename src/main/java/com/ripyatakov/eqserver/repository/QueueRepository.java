@@ -1,7 +1,6 @@
 package com.ripyatakov.eqserver.repository;
 
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.Queue;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Date;

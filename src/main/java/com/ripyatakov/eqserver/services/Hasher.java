@@ -1,4 +1,4 @@
-package com.ripyatakov.eqserver.service;
+package com.ripyatakov.eqserver.services;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

@@ -1,8 +1,8 @@
-package com.ripyatakov.eqserver.service;
+package com.ripyatakov.eqserver.services;
 
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.Review;
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.Queue;
+import com.ripyatakov.eqserver.entities.Review;
+import com.ripyatakov.eqserver.entities.User;
 import com.ripyatakov.eqserver.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

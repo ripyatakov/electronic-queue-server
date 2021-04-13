@@ -1,16 +1,16 @@
-package com.ripyatakov.eqserver.controller;
+package com.ripyatakov.eqserver.controllers;
 
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.QueueListLive;
-import com.ripyatakov.eqserver.entity.Review;
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.Queue;
+import com.ripyatakov.eqserver.entities.QueueListLive;
+import com.ripyatakov.eqserver.entities.Review;
+import com.ripyatakov.eqserver.entities.User;
 import com.ripyatakov.eqserver.html.ReviewHtml;
 import com.ripyatakov.eqserver.json.UserInQueue;
-import com.ripyatakov.eqserver.managers.QueryManager;
+import com.ripyatakov.eqserver.services.QueryManager;
 import com.ripyatakov.eqserver.requests.AuthenticationRequest;
 import com.ripyatakov.eqserver.requests.AuthorizationRequest;
 import com.ripyatakov.eqserver.requests.ManagerRequest;
-import com.ripyatakov.eqserver.service.*;
+import com.ripyatakov.eqserver.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

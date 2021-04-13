@@ -1,4 +1,4 @@
-package com.ripyatakov.eqserver.service;
+package com.ripyatakov.eqserver.services;
 
 import java.text.SimpleDateFormat;
 

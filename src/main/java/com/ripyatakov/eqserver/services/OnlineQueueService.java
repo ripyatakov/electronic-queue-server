@@ -1,9 +1,9 @@
-package com.ripyatakov.eqserver.service;
+package com.ripyatakov.eqserver.services;
 
 import com.ripyatakov.eqserver.json.QueueData;
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.QueueListLive;
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.Queue;
+import com.ripyatakov.eqserver.entities.QueueListLive;
+import com.ripyatakov.eqserver.entities.User;
 import com.ripyatakov.eqserver.pdo.OnlineQueue;
 import com.ripyatakov.eqserver.pdo.OnlineQueueLive;
 import org.springframework.stereotype.Service;

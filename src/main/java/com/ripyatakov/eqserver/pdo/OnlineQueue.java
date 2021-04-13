@@ -1,7 +1,6 @@
 package com.ripyatakov.eqserver.pdo;
 
-import com.ripyatakov.eqserver.entity.Queue;
-import com.ripyatakov.eqserver.entity.User;
+import com.ripyatakov.eqserver.entities.User;
 import com.ripyatakov.eqserver.json.QueueData;
 
 import java.util.Date;
