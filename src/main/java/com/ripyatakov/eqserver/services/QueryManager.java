@@ -216,7 +216,8 @@ public class QueryManager {
                 List<Date> X = records.stream().map(a -> a.getEqStartServeTime()).collect(Collectors.toList());
                 List<Float> Y = records.stream()
                         .map(
-                                a -> (float) ((a.getEqStartServeTime().getTime() - a.getEqEnterTime().getTime()) / 1000.0 / 60.0) - a.getEqServeTimeMin()
+                                a -> (float) ((a.getEqStartServeTime().getTime() - a.getEqEnterTime().getTime()) / 1000.0 / 60.0)
+                                        - a.getEqServeTimeMin()
                         )
                         .map(a -> (a < 0) ? 0 : a)
                         .collect(Collectors.toList());

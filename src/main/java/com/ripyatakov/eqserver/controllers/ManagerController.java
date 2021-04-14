@@ -147,7 +147,6 @@ public class ManagerController {
         }
         return "errorPage";
     }
-
     @PostMapping("/queueReview/{qid}")
     public String queueReview(@ModelAttribute AuthenticationRequest authenticationRequest, @PathVariable int qid, Model model){
         try {

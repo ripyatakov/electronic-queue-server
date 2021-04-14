@@ -21,16 +21,7 @@ public class Hasher {
                 toHash.getBytes(StandardCharsets.UTF_8));
         return bytesToHex(encodedhash);
     }
-    public static String getQueueCode(int qid){
-        qid = (qid<<bitCoef) * multCoef + offset;
-        return Integer.toString(qid, base);
-    }
-    public static int getQId(String code){
-        code = code.toLowerCase(Locale.ROOT);
-        int qid = Integer.parseInt(code, base);
-        qid = ((qid - offset) / multCoef) >> bitCoef;
-        return qid;
-    }
+
     private static String bytesToHex(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (int i = 0; i < hash.length; i++) {
@@ -41,5 +32,15 @@ public class Hasher {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+    public static String getQueueCode(int qid){
+        qid = (qid<<bitCoef) * multCoef + offset;
+        return Integer.toString(qid, base);
+    }
+    public static int getQId(String code){
+        code = code.toLowerCase(Locale.ROOT);
+        int qid = Integer.parseInt(code, base);
+        qid = ((qid - offset) / multCoef) >> bitCoef;
+        return qid;
     }
 }
